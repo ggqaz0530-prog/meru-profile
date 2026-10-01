@@ -1346,12 +1346,12 @@
         if (localStorage.getItem('is_dark_mode') === 'true') {
           document.body.classList.add('dark-mode');
           const btn = document.getElementById('dark-mode-toggle-btn');
-          if (btn) btn.textContent = '☀️ 라이트';
+          if (btn) btn.textContent = '☀️️ 라이트';
         }
       } catch(e) {}
     }
 
-    /* 💽 음악 재생 플레이어 상태 및 로직 (음량 조절 추가) */
+    /* 💽 음악 재생 플레이어 상태 및 로직 (일시정지 시 위치 유지 기능 적용) */
     let musicState = {
       cdImg: "",
       currentIndex: 0,
@@ -1428,14 +1428,17 @@
       if (songs.length === 0) return;
 
       if (musicState.isPlaying) {
+        // 일시정지 시 현재 재생 중인 위치(currentTime)를 그대로 유지한 채 정지
         audioEl.pause();
         musicState.isPlaying = false;
       } else {
         const currentPath = songs[musicState.currentIndex][2] || '';
+        // 현재 소스와 오디오 태그의 소스가 다를 때만 새로 로드
         if (audioEl.src !== currentPath && currentPath) {
           audioEl.src = currentPath;
         }
         audioEl.volume = musicState.volume !== undefined ? musicState.volume : 1;
+        
         audioEl.play().then(() => {
           musicState.isPlaying = true;
           updateMusicPlayerUI();
@@ -1456,6 +1459,7 @@
       if (musicState.currentIndex >= songs.length) musicState.currentIndex = 0;
 
       audioEl.pause();
+      audioEl.currentTime = 0; // 곡 변경 시에는 처음부터 재생
       musicState.isPlaying = false;
       updateMusicPlayerUI();
 
