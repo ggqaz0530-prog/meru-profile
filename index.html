@@ -5,20 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MY LOVELY PROFILE</title>
 
-  <!-- Firebase SDK 라이브러리 추가 -->
+  <!-- Firebase SDK 및 캘리그라피 필기체 폰트 추가 -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
     :root {
-      --bg-color: #fff0f5;
-      --grid-color: #ffd1dc;
+      --bg-color: #fff8fb;
+      --grid-color: #ffe6ed;
       --accent-color: #ff4d73;
       --text-color: #5c3a42;
-      --card-border: #ffccd5;
+      --card-border: #ffd1dc;
       --tab-text-color: #ff758c;
+      --card-bg: rgba(255, 255, 255, 0.96);
+      --item-bg: #fff2f5;
+      --item-border: #ffe0e6;
+    }
+
+    /* 🌙 다크모드 색상 변환 */
+    body.dark-mode {
+      --bg-color: #1a1215;
+      --grid-color: #2c1a20;
+      --accent-color: #ff6b8b;
+      --text-color: #f7e1e6;
+      --card-border: #4a3038;
+      --tab-text-color: #ff94a8;
+      --card-bg: rgba(36, 25, 29, 0.96);
+      --item-bg: #2d1d22;
+      --item-border: #422a32;
     }
 
     * {
@@ -29,19 +46,52 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* 🎀 깔끔하고 귀여운 핑크 도트 배경 패턴 */
     body {
       background-color: var(--bg-color);
-      background-image: 
-        linear-gradient(var(--grid-color) 1.5px, transparent 1.5px),
-        linear-gradient(90deg, var(--grid-color) 1.5px, transparent 1.5px);
+      background-image: radial-gradient(var(--grid-color) 2px, transparent 2px);
       background-size: 24px 24px;
       color: var(--text-color);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 16px 120px;
+      padding: 30px 16px 120px;
       min-height: 100vh;
       opacity: 1;
+      position: relative;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* 우측 하단 둥실둥실 메럿 마스코트 스티커 */
+    .floating-merot-mascot {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 105px;
+      z-index: 990;
+      pointer-events: auto;
+      cursor: pointer;
+      filter: drop-shadow(0 8px 18px rgba(255, 77, 115, 0.3));
+      animation: merotFloating 3.6s ease-in-out infinite;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .floating-merot-mascot:hover {
+      transform: scale(1.15) rotate(-6deg);
+    }
+    .floating-merot-mascot img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @keyframes merotFloating {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-9px) rotate(3deg); }
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 16px 8px 120px; }
+      .floating-merot-mascot { width: 75px; bottom: 85px; right: 14px; }
     }
 
     body.modal-open {
@@ -50,10 +100,12 @@
 
     .container {
       width: 100%;
-      max-width: 1280px;
+      max-width: 1024px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 22px;
+      position: relative;
+      z-index: 1;
     }
 
     .search-container {
@@ -61,17 +113,24 @@
       max-width: 720px;
       margin: 0 auto;
       position: relative;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
     }
 
+    /* 🔍 조약돌 캡슐 검색창 */
     .search-input-wrapper {
       display: flex;
       align-items: center;
-      background: #ffffff;
+      background: var(--card-bg);
       border: 3px solid var(--card-border);
-      border-radius: 24px;
-      padding: 6px 16px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      border-radius: 28px;
+      padding: 8px 18px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
       gap: 10px;
+      flex: 1;
+      max-width: 550px;
     }
 
     .search-input-wrapper input {
@@ -83,6 +142,27 @@
       color: var(--text-color);
       background: transparent;
     }
+
+    .search-input-wrapper input::placeholder {
+      color: var(--tab-text-color);
+      opacity: 0.7;
+    }
+
+    /* 🌙 다크모드 버튼 */
+    .dark-mode-btn {
+      background: var(--card-bg);
+      border: 3px solid var(--card-border);
+      color: var(--accent-color);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 10px 18px;
+      border-radius: 28px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      white-space: nowrap;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+    }
+    .dark-mode-btn:hover { transform: scale(1.06); background: var(--item-bg); }
 
     .search-clear-btn {
       background: transparent;
@@ -99,11 +179,11 @@
       top: 100%;
       left: 0;
       width: 100%;
-      background: #ffffff;
+      background: var(--card-bg);
       border: 3px solid var(--card-border);
-      border-radius: 20px;
+      border-radius: 22px;
       margin-top: 8px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
       max-height: 280px;
       overflow-y: auto;
       overscroll-behavior: contain;
@@ -117,9 +197,9 @@
 
     .search-result-item {
       padding: 10px 14px;
-      border-radius: 12px;
-      background: #fff8f9;
-      border: 1.5px solid #ffe0e6;
+      border-radius: 16px;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
       cursor: pointer;
       display: flex;
       justify-content: space-between;
@@ -127,10 +207,9 @@
       gap: 10px;
       transition: background 0.2s;
     }
-
-    .search-result-item:hover { background: #ffe8ec; }
+    .search-result-item:hover { opacity: 0.85; }
     .search-result-text { font-size: 0.88rem; font-weight: 700; color: var(--text-color); word-break: break-all; }
-    .search-result-badge { font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 10px; background: var(--accent-color); color: #ffffff; white-space: nowrap; }
+    .search-result-badge { font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 14px; background: var(--accent-color); color: #ffffff; white-space: nowrap; }
 
     @keyframes highlightPulse {
       0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 77, 115, 0.8); }
@@ -149,96 +228,91 @@
     }
 
     .page-btn {
-      background: #ffe4e8;
+      background: var(--item-bg);
       border: 1.5px solid var(--card-border);
       color: var(--accent-color);
       font-size: 0.82rem;
       font-weight: 800;
-      padding: 5px 11px;
-      border-radius: 12px;
+      padding: 6px 12px;
+      border-radius: 14px;
       cursor: pointer;
       transition: all 0.2s;
       touch-action: manipulation;
       user-select: none;
     }
-
     .page-btn.active {
       background: var(--accent-color);
       color: #ffffff;
       border-color: var(--accent-color);
       box-shadow: 0 2px 8px rgba(255, 77, 115, 0.3);
     }
-
     .page-btn:hover:not(.active):not(:disabled) { background: var(--card-border); }
 
+    /* 🏷️ 조약돌 캡슐 탭 네비게이션 */
     .sheet-tabs {
       display: flex;
-      background: #ffffff;
+      background: var(--card-bg);
       padding: 6px;
-      border-radius: 24px;
+      border-radius: 28px;
       border: 3px solid var(--card-border);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
       gap: 6px;
       width: 100%;
-      max-width: 720px;
+      max-width: 780px;
       margin: 0 auto;
       flex-wrap: wrap;
     }
 
     .tab-btn {
       flex: 1;
-      min-width: 90px;
+      min-width: 80px;
       padding: 10px 0;
       border: none;
       background: transparent;
-      border-radius: 18px;
+      border-radius: 20px;
       font-weight: 800;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--tab-text-color);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       touch-action: manipulation;
       user-select: none;
     }
-
+    .tab-btn:hover:not(.active) { transform: scale(1.03); background: var(--item-bg); }
     .tab-btn.active {
       background: var(--accent-color);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 14px rgba(255, 77, 115, 0.3);
+      transform: scale(1.02);
     }
 
-    .tab-content { display: none; flex-direction: column; gap: 18px; width: 100%; }
+    .tab-content { display: none; flex-direction: column; gap: 22px; width: 100%; }
     .tab-content.active { display: flex; }
 
-    #tab-main { max-width: 1080px; margin: 0 auto; }
-    #tab-monthly { max-width: 100%; }
-    #tab-achievements { max-width: 720px; margin: 0 auto; }
-    #tab-games { max-width: 720px; margin: 0 auto; }
-    #tab-tmi { max-width: 880px; margin: 0 auto; }
-
-    .main-columns-grid {
+    .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      align-items: start;
+      gap: 20px;
+      align-items: stretch;
+      width: 100%;
+    }
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 820px) {
-      .main-columns-grid { grid-template-columns: 1fr; }
-    }
-
-    .main-col-left, .main-col-right { display: flex; flex-direction: column; gap: 18px; }
-
+    /* 둥글둥글 부드러운 독립 카드 박스 */
     .card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 24px;
-      padding: 24px;
+      background: var(--card-bg);
+      border-radius: 30px;
+      padding: 26px;
       border: 3px solid var(--card-border);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
       position: relative;
       width: 100%;
       max-width: 100%;
+      height: fit-content;
       overflow: hidden;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     body.admin-mode [contenteditable="true"] {
@@ -246,10 +320,10 @@
       transition: background 0.2s;
       min-width: 20px;
       display: inline-block;
-      border-radius: 6px;
+      border-radius: 8px;
     }
-    body.admin-mode [contenteditable="true"]:hover { background: #ffe4e8; cursor: text; }
-    body.admin-mode [contenteditable="true"]:focus { outline: 2px solid var(--accent-color); background: #ffffff; }
+    body.admin-mode [contenteditable="true"]:hover { background: var(--item-bg); cursor: text; }
+    body.admin-mode [contenteditable="true"]:focus { outline: 2px solid var(--accent-color); background: var(--card-bg); }
 
     [contenteditable="true"] a, .info-text a, .profile-bio a, .game-review-text a, .tmi-content-text a {
       color: var(--accent-color);
@@ -257,32 +331,122 @@
       text-decoration: underline;
     }
 
-    .profile { text-align: center; }
-    .profile-img-wrapper { position: relative; width: 110px; height: 110px; margin: 0 auto 16px; }
-    .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #fff0f5; border: 4px solid var(--card-border); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); display: block; }
-    .img-upload-btn { position: absolute; bottom: 0; right: -4px; background: var(--accent-color); color: #ffffff; font-size: 0.72rem; padding: 5px 10px; border-radius: 14px; cursor: pointer; font-weight: 700; user-select: none; }
-    .profile h1 { font-size: 1.45rem; font-weight: 800; color: var(--accent-color); margin-bottom: 6px; word-break: break-all; }
-    .profile-bio { font-size: 0.92rem; color: var(--text-color); line-height: 1.6; text-align: center; min-height: 30px; white-space: pre-wrap; word-break: break-all; width: 100%; margin-bottom: 16px; }
+    /* 🌟 큼직하고 시원한 대형 홈 배너 스타일 (1216 x 832 비율) */
+    .home-banner-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 920px;
+      aspect-ratio: 1216 / 832;
+      max-height: 520px;
+      margin: 0 auto;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 3px solid var(--card-border);
+      background: var(--item-bg);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .home-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .home-banner-upload-btn {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: var(--accent-color);
+      color: #ffffff;
+      font-size: 0.8rem;
+      padding: 8px 16px;
+      border-radius: 18px;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
 
-    .profile-info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      text-align: left;
-      margin-top: 10px;
+    /* 🎀 프로필 시트 전용 (왼쪽 세로형 832x1216 비율 사진 + 아래 이름/소개) */
+    .profile-layout-flex {
+      display: flex;
+      gap: 26px;
+      align-items: flex-start;
+    }
+    @media (max-width: 768px) {
+      .profile-layout-flex { flex-direction: column; align-items: center; text-align: center; }
+    }
+    .profile-left-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 240px;
+      flex-shrink: 0;
+    }
+    @media (max-width: 768px) { .profile-left-col { width: 100%; } }
+
+    .profile-img-wrapper {
+      position: relative;
+      width: 200px;
+      height: 292px; /* 832:1216 포트레이트 비율 */
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--item-bg);
+      border: 4px solid var(--card-border);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 14px;
+    }
+    .profile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .img-upload-btn {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: var(--accent-color);
+      color: #ffffff;
+      font-size: 0.72rem;
+      padding: 5px 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 800;
+      user-select: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .profile h1 { font-size: 1.4rem; font-weight: 900; color: var(--accent-color); margin-bottom: 6px; word-break: break-all; }
+    .profile-bio { font-size: 0.9rem; color: var(--text-color); line-height: 1.5; text-align: center; min-height: 28px; white-space: pre-wrap; word-break: break-all; width: 100%; margin-bottom: 10px; }
+
+    .profile-right-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
       width: 100%;
     }
 
-    @media (max-width: 480px) {
+    /* 프로필 상세 정보 칸 컴팩트화 (여백 최소화) */
+    .profile-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      text-align: left;
+      width: 100%;
+    }
+    @media (max-width: 500px) {
       .profile-info-grid { grid-template-columns: 1fr; }
       .info-box-item.full-width { grid-column: span 1; }
     }
 
     .info-box-item {
-      background: #fff8f9;
-      border: 1.5px solid #ffe0e6;
-      border-radius: 16px;
-      padding: 10px 12px;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
+      border-radius: 14px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -292,15 +456,118 @@
       flex-wrap: wrap;
     }
     .info-box-item.full-width { grid-column: span 2; }
-    .info-box-label { font-size: 0.78rem; font-weight: 800; color: var(--accent-color); background: #ffe4e8; padding: 4px 10px; border-radius: 12px; white-space: nowrap; outline: none; flex: 0 0 auto; }
-    .info-box-val { font-size: 0.85rem; font-weight: 700; color: var(--text-color); flex: 1 1 auto; text-align: right; outline: none; min-width: 0; word-break: break-all; overflow-wrap: break-word; white-space: pre-wrap; }
+    .info-box-label { font-size: 0.72rem; font-weight: 800; color: var(--accent-color); background: var(--card-bg); padding: 3px 8px; border-radius: 10px; white-space: nowrap; outline: none; flex: 0 0 auto; border: 1px solid var(--item-border); }
+    .info-box-val { font-size: 0.82rem; font-weight: 700; color: var(--text-color); flex: 1 1 auto; text-align: right; outline: none; min-width: 0; word-break: break-all; overflow-wrap: break-word; white-space: pre-wrap; }
 
     #first-stream-text { white-space: nowrap !important; flex-shrink: 0 !important; }
     body.admin-mode #first-stream-picker { width: 95px !important; padding: 2px 3px !important; font-size: 0.72rem !important; border-radius: 8px !important; }
-    .stream-days-badge { background: var(--accent-color); color: #ffffff; padding: 4px 10px; border-radius: 12px; font-size: 0.82rem; font-weight: 800; display: inline-block; }
+    .stream-days-badge { background: var(--accent-color); color: #ffffff; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 900; display: inline-block; }
+
+    /* 🐾 팬 캐릭터 스타일 */
+    .fan-character-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .fan-char-img-wrapper {
+      position: relative;
+      width: 90px;
+      height: 90px;
+    }
+    .fan-char-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--card-bg);
+      border: 3px solid var(--card-border);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    /* 🎈 시그니처 별풍선 칸 전용 스타일 (세로로 확실히 길게 늘리고 이미지 꽉 차게 대확장) */
+    .sig-balloon-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      text-align: center;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
+      border-radius: 18px;
+      padding: 16px;
+      height: 100%;
+      min-height: 380px;
+    }
+    .sig-balloon-img-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 290px;
+      height: 295px; /* 세로로 아주 큼직하게 꽉 차는 크기 */
+      border-radius: 26px;
+      overflow: hidden;
+      background: var(--card-bg);
+      border: 4px solid var(--card-border);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    }
+    .sig-balloon-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 🎁 OGQ 스티커 칸 전용 스타일 (한 줄에 정확히 3개씩 들어가도록 설정) */
+    .ogq-grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .ogq-item-card {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.2s;
+    }
+    .ogq-item-card:hover { transform: scale(1.05); }
+    .ogq-item-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .ogq-edit-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+    }
+    body.admin-mode .ogq-edit-overlay.admin-only {
+      display: flex !important;
+    }
 
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .section-title { font-size: 1.05rem; font-weight: 800; color: var(--accent-color); display: flex; align-items: center; gap: 6px; }
+    .section-title { font-size: 1.05rem; font-weight: 900; color: var(--accent-color); display: flex; align-items: center; gap: 6px; }
 
     .admin-only { display: none !important; }
     body.admin-mode .admin-only { display: inline-block !important; }
@@ -308,38 +575,56 @@
 
     .card-move-btns { display: flex; gap: 4px; align-items: center; }
     .move-btn, .resize-btn {
-      background: #ffe4e8;
+      background: var(--item-bg);
       border: 1px solid var(--card-border);
       color: var(--accent-color);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 800;
-      padding: 2px 6px;
+      padding: 3px 7px;
       border-radius: 8px;
       cursor: pointer;
       touch-action: manipulation;
       user-select: none;
     }
     .move-btn:hover, .resize-btn:hover { background: var(--card-border); }
-    .add-btn { background: #ffe4e8; border: none; color: var(--accent-color); padding: 5px 12px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; }
+    .add-btn { background: var(--item-bg); border: 1.5px solid var(--item-border); color: var(--accent-color); padding: 5px 12px; border-radius: 14px; font-size: 0.8rem; font-weight: 800; cursor: pointer; touch-action: manipulation; user-select: none; }
     .add-btn:hover { background: var(--card-border); }
 
     .list-wrapper { display: flex; flex-direction: column; gap: 10px; }
-    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff8f9; border-radius: 16px; border: 1.5px solid #ffe0e6; gap: 10px; min-width: 0; }
+    .item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--item-bg); border-radius: 18px; border: 1.5px solid var(--item-border); gap: 10px; min-width: 0; }
+    
+    /* 🏆 방송 업적 일대기 아이템 왼쪽 정렬 및 여백 확보 */
+    .achievement-item {
+      justify-content: flex-start !important;
+      text-align: left !important;
+    }
+    .achievement-item .anniv-date {
+      flex: 0 0 auto;
+    }
+    .achievement-item .info-text {
+      flex: 1 1 auto;
+      text-align: left !important;
+      word-break: break-all;
+    }
+    .achievement-item .move-btn,
+    .achievement-item .del-btn {
+      flex: 0 0 auto;
+    }
+
     .del-btn { background: transparent; border: none; color: #ffb6c1; font-size: 1.1rem; cursor: pointer; padding: 0 4px; font-weight: bold; touch-action: manipulation; user-select: none; }
     .del-btn:hover { color: var(--accent-color); }
 
-    body.admin-mode .link-anchor, body.admin-mode .schedule-view-box { display: none !important; }
+    body.admin-mode .link-anchor { display: none !important; }
 
-    .link-anchor { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; width: 100%; text-decoration: none; color: var(--accent-color); font-weight: 700; font-size: 0.92rem; cursor: pointer; min-width: 0; }
-    .link-anchor:hover { background: #ffe8ec; }
+    .link-anchor { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; width: 100%; text-decoration: none; color: var(--accent-color); font-weight: 700; font-size: 0.9rem; cursor: pointer; min-width: 0; }
+    .link-anchor:hover { background: var(--item-bg); }
     .link-name { min-width: 0; word-break: break-all; }
 
     .link-edit-box { width: 100%; padding: 4px 0; display: flex; flex-direction: column; gap: 6px; }
-    .url-input, .date-input, .time-text-input, .text-input { width: 100%; padding: 7px 10px; font-size: 0.85rem; border: 1.5px solid var(--card-border); border-radius: 10px; color: var(--text-color); background: #ffffff; }
+    .url-input, .date-input, .time-text-input, .text-input { width: 100%; padding: 8px 12px; font-size: 0.85rem; border: 1.5px solid var(--card-border); border-radius: 12px; color: var(--text-color); background: var(--card-bg); }
     .anniv-date-picker { width: 120px !important; flex-shrink: 0 !important; }
-    .time-text-input { width: 80px; padding: 6px 8px; font-size: 0.82rem; font-weight: 700; text-align: center; }
 
-    .select-input { padding: 6px 10px; font-size: 0.82rem; font-weight: 700; border: 1.5px solid var(--card-border); border-radius: 12px; color: var(--accent-color); background: #ffffff; cursor: pointer; outline: none; }
+    .select-input { padding: 6px 10px; font-size: 0.82rem; font-weight: 700; border: 1.5px solid var(--card-border); border-radius: 14px; color: var(--accent-color); background: var(--card-bg); cursor: pointer; outline: none; }
 
     body:not(.admin-mode) .game-rating-select {
       pointer-events: none;
@@ -355,28 +640,157 @@
       cursor: default;
     }
 
-    .schedule-view-box { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 6px; min-width: 0; }
-    .schedule-view-box .info-text { flex: 1 1 0; min-width: 0; word-break: break-all; overflow-wrap: break-word; white-space: pre-wrap; }
-    .schedule-view-box .sub-text { font-size: 0.82rem; font-weight: 800; color: var(--accent-color); white-space: nowrap; flex: 0 0 auto; }
-    .day-badge { font-weight: 800; font-size: 0.82rem; padding: 6px 14px; border-radius: 20px; background: var(--accent-color); color: #ffffff; white-space: nowrap; flex: 0 0 auto; }
-    .anniv-date { font-weight: 800; font-size: 0.82rem; padding: 6px 12px; border-radius: 20px; background: #ffecb3; color: #d97706; white-space: nowrap; flex: 0 0 auto; }
-    .dday-badge { font-weight: 800; font-size: 0.78rem; padding: 5px 10px; border-radius: 14px; background: var(--accent-color); color: #ffffff; min-width: 50px; text-align: center; flex: 0 0 auto; }
+    .anniv-date { font-weight: 900; font-size: 0.82rem; padding: 5px 12px; border-radius: 18px; background: #ffecb3; color: #d97706; white-space: nowrap; flex: 0 0 auto; }
+    .dday-badge { font-weight: 900; font-size: 0.78rem; padding: 5px 10px; border-radius: 14px; background: var(--accent-color); color: #ffffff; min-width: 50px; text-align: center; flex: 0 0 auto; }
 
-    .schedule-edit-box { display: flex; align-items: center; width: 100%; gap: 6px; min-width: 0; }
-    .sch-day-select { flex: 0 0 auto; }
-    .sch-content-edit { flex: 1 1 0 !important; min-width: 0 !important; word-break: break-all !important; overflow-wrap: break-word !important; white-space: pre-wrap !important; outline: none; }
-    .sch-time-zone-edit { flex: 0 0 auto; display: flex; align-items: center; gap: 3px !important; }
-    .sch-ampm { padding: 4px 3px !important; font-size: 0.75rem !important; width: 52px !important; border-radius: 8px !important; flex-shrink: 0 !important; }
-    .sch-time-val { width: 58px !important; padding: 4px 3px !important; font-size: 0.78rem !important; border-radius: 8px !important; flex-shrink: 0 !important; }
+    .mc-server-flex-container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .mc-tag-item { display: inline-flex; align-items: center; gap: 6px; background: var(--item-bg); border: 1.5px solid var(--item-border); padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); max-width: 100%; }
+    .mc-tag-text { font-weight: 800; color: var(--accent-color); font-size: 0.85rem; word-break: break-all; }
 
-    .mc-server-flex-container { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .mc-tag-item { display: inline-flex; align-items: center; gap: 6px; background: #ffe4e8; border: 1.5px solid var(--card-border); padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 6px rgba(255, 133, 162, 0.08); max-width: 100%; }
-    .mc-tag-text { font-weight: 800; color: var(--accent-color); font-size: 0.88rem; word-break: break-all; }
+    /* ==================== 💽 음악 재생 플레이어 스타일 (음량 조절 추가) ==================== */
+    .home-music-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      text-align: center;
+    }
+    .music-player-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+    }
+    .cd-disc-wrapper {
+      position: relative;
+      width: 290px;
+      height: 290px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,0.18));
+    }
+    .cd-disc {
+      width: 290px;
+      height: 290px;
+      border-radius: 50%;
+      background-color: #222;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 6px solid #e8e8e8;
+      box-shadow: inset 0 0 24px rgba(255,255,255,0.3);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      image-rendering: -webkit-optimize-contrast;
+    }
+    .cd-disc.spinning {
+      animation: cdSpin 4s linear infinite;
+    }
+    @keyframes cdSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .cd-center-hole {
+      width: 24px;
+      height: 24px;
+      background: var(--card-bg);
+      border-radius: 50%;
+      border: 3px solid #d0d0d0;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 2;
+    }
+    .cd-disc::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 50%;
+      border: 1px dashed rgba(255,255,255,0.25);
+      pointer-events: none;
+    }
+    .song-details {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .player-btn-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    .player-action-btn {
+      background: var(--item-bg);
+      border: 2px solid var(--item-border);
+      color: var(--accent-color);
+      font-weight: 900;
+      font-size: 0.95rem;
+      padding: 8px 16px;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .player-action-btn:hover { transform: scale(1.08); background: var(--card-border); }
+    .player-main-play {
+      background: var(--accent-color);
+      color: #ffffff;
+      border-color: var(--accent-color);
+      padding: 8px 24px;
+    }
+    .player-main-play:hover { background: #ff335e; }
 
-    .video-edit-box { display: none !important; }
-    body.admin-mode .video-edit-box { display: flex !important; flex-direction: column; gap: 8px; margin-top: 14px; width: 100%; }
+    .volume-slider-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--accent-color);
+    }
+    .volume-slider-box input[type="range"] {
+      accent-color: var(--accent-color);
+      cursor: pointer;
+      width: 100px;
+    }
 
-    /* 📅 월간 달력 최적화 */
+    /* 재생목록 접기/펼치기 토글 버튼 */
+    .playlist-toggle-btn {
+      background: var(--item-bg);
+      border: 1.5px solid var(--item-border);
+      color: var(--accent-color);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .playlist-accordion-content {
+      width: 100%;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 2px dashed var(--card-border);
+    }
+    .playlist-accordion-content.open {
+      display: flex;
+    }
+
+    /* ==================== 📅 월간 달력 레이아웃 & 스크롤 최적화 ==================== */
     .calendar-container { 
       width: 100%; 
       overflow-x: hidden; 
@@ -385,45 +799,52 @@
     }
     .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; }
     .calendar-header h2 { font-size: 1.5rem; color: var(--accent-color); font-weight: 900; letter-spacing: -0.5px; }
-    .cal-nav-btn { background: #ffe4e8; border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
+    .cal-nav-btn { background: var(--item-bg); border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
     .cal-nav-btn:hover { background: var(--card-border); }
 
-    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; }
-    .cal-day-name { font-size: 0.95rem; font-weight: 800; color: var(--accent-color); padding-bottom: 6px; text-align: center; }
+    .calendar-grid { 
+      display: grid; 
+      grid-template-columns: repeat(7, minmax(0, 1fr)); 
+      gap: 10px; 
+      width: 100%; 
+    }
+    .cal-day-name { font-size: 0.98rem; font-weight: 900; color: var(--accent-color); padding-bottom: 8px; text-align: center; }
     .cal-cell { 
-      background: #fff8f9; 
-      border: 2px solid #ffe0e6; 
-      border-radius: 16px; 
-      height: 150px; 
-      padding: 8px; 
+      background: var(--item-bg); 
+      border: 2px solid var(--item-border); 
+      border-radius: 20px; 
+      height: 190px;
+      padding: 10px; 
       display: flex; 
       flex-direction: column; 
-      gap: 4px; 
+      gap: 6px; 
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); 
       overflow-y: auto; 
       overscroll-behavior: auto; 
-      touch-action: pan-y;
+      touch-action: pan-y; 
+      min-width: 0; 
+      cursor: pointer; 
       -webkit-overflow-scrolling: touch; 
     }
-    .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; }
+    .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; cursor: default; }
     .cal-cell::-webkit-scrollbar { width: 3px; }
     .cal-cell::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
     .cal-cell-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 2px; }
-    .cal-num { font-weight: 900; font-size: 0.95rem; color: var(--text-color); }
+    .cal-num { font-weight: 900; font-size: 1rem; color: var(--text-color); }
     .cal-add-evt-btn { background: var(--card-border); border: none; color: var(--accent-color); width: 22px; height: 22px; border-radius: 50%; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; }
 
-    .cal-event-list { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: #ffffff; color: var(--text-color); padding: 6px 8px; border-radius: 10px; border: 1.5px solid #ffd1dc; width: 100%; position: relative; box-shadow: 0 2px 4px rgba(255, 133, 162, 0.08); cursor: pointer; transition: transform 0.15s; }
-    .cal-event-item:hover { transform: scale(1.01); background: #fff0f3; }
-    .cal-event-top { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 2px; }
+    .cal-event-list { display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 0; }
+    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: var(--card-bg); color: var(--text-color); padding: 6px 8px; border-radius: 12px; border: 1.5px solid var(--item-border); width: 100%; position: relative; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); cursor: pointer; transition: transform 0.15s; min-width: 0; }
+    .cal-event-item:hover { transform: scale(1.01); opacity: 0.9; }
+    .cal-event-top { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 2px; min-width: 0; }
     .cal-event-time { 
-      font-size: 0.68rem; 
+      font-size: 0.7rem; 
       font-weight: 800; 
       color: var(--accent-color); 
       outline: none; 
-      background: #ffe4e8; 
-      padding: 1px 4px; 
-      border-radius: 4px; 
+      background: var(--item-bg); 
+      padding: 1px 6px; 
+      border-radius: 6px; 
       white-space: nowrap !important; 
       word-break: normal !important; 
       display: inline-block; 
@@ -432,34 +853,87 @@
       text-overflow: ellipsis; 
     }
     .cal-event-time:empty:not([contenteditable="true"]) { display: none; }
-    .cal-event-text { font-size: 0.78rem; font-weight: 700; outline: none; word-break: break-all; word-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.25; }
+    .cal-event-text { font-size: 0.82rem; font-weight: 700; outline: none; word-break: break-all; word-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.3; min-width: 0; }
     .cal-event-del { border: none; background: transparent; color: #ffb6c1; font-size: 0.95rem; cursor: pointer; padding: 2px 4px; touch-action: manipulation; user-select: none; }
 
+    /* ==================== 📱 모바일 최적화 미디어 쿼리 ==================== */
     @media (max-width: 768px) {
-      body { padding: 16px 6px 120px; }
-      .card { padding: 14px 12px; border-radius: 18px; }
+      body { padding: 12px 6px 120px; }
+      .card { padding: 16px 12px; border-radius: 20px; }
       .sheet-tabs { padding: 4px; border-radius: 18px; gap: 4px; }
-      .tab-btn { min-width: 62px; font-size: 0.74rem; padding: 8px 0; border-radius: 12px; }
+      .tab-btn { min-width: 54px; font-size: 0.7rem; padding: 8px 0; border-radius: 12px; }
       .calendar-header h2 { font-size: 1.2rem; }
       .cal-nav-btn { padding: 6px 14px; font-size: 0.85rem; border-radius: 12px; }
-      .calendar-grid { gap: 3px; }
-      .cal-day-name { font-size: 0.76rem; padding-bottom: 4px; }
-      .cal-cell { 
-        min-height: 95px; 
-        height: auto; 
-        padding: 3px 2px; 
-        border-width: 1.5px; 
-        border-radius: 10px; 
-        overflow: visible !important; 
+
+      .calendar-grid { 
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important; 
+        gap: 4px !important; 
+        width: 100% !important;
       }
-      .cal-num { font-size: 0.75rem; }
-      .cal-add-evt-btn { width: 20px; height: 22px; font-size: 0.8rem; }
-      .cal-event-item { padding: 4px 4px; border-radius: 6px; border-width: 1px; }
-      .cal-event-time { font-size: 0.62rem; padding: 1px 3px; border-radius: 3px; white-space: nowrap !important; word-break: normal !important; display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-      body:not(.admin-mode) .cal-event-text { font-size: 0.68rem; line-height: 1.2; min-height: 16px; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-break: normal !important; letter-spacing: -0.4px; }
-      body.admin-mode .cal-event-text { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; word-break: normal !important; }
-      .cal-event-del { font-size: 1.05rem; padding: 2px 6px; }
-      .url-input, .date-input, .time-text-input, .text-input, .select-input, .sch-ampm, .sch-time-val, #global-search-input { font-size: 16px !important; }
+      .cal-day-name { font-size: 0.76rem; padding-bottom: 4px; }
+        
+      .cal-cell { 
+        height: 105px !important; 
+        min-height: 105px !important; 
+        max-height: 105px !important; 
+        padding: 4px 3px !important; 
+        border-width: 1.5px !important; 
+        border-radius: 12px !important; 
+        min-width: 0 !important;
+        overflow: hidden !important; 
+        touch-action: pan-y !important;
+        gap: 2px !important;
+      }
+      .cal-cell.empty-cell { 
+        height: 105px !important; 
+        min-height: 105px !important; 
+        max-height: 105px !important; 
+        border: none !important; 
+        background: transparent !important; 
+        box-shadow: none !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        pointer-events: none !important; 
+      }
+      .cal-cell-header { margin-bottom: 1px !important; }
+      .cal-num { font-size: 0.75rem !important; }
+      .cal-add-evt-btn { width: 18px !important; height: 18px !important; font-size: 0.75rem !important; flex-shrink: 0 !important; }
+
+      .cal-event-list { gap: 2px !important; }
+      .cal-event-item { 
+        padding: 2px 4px !important; 
+        border-radius: 6px !important; 
+        border-width: 1px !important; 
+        min-width: 0 !important; 
+      }
+      .cal-event-top { gap: 1px !important; }
+      .cal-event-time { 
+        font-size: 0.58rem !important; 
+        padding: 1px 2px !important; 
+        border-radius: 3px !important; 
+        line-height: 1.1 !important;
+      }
+      body:not(.admin-mode) .cal-event-text { 
+        font-size: 0.62rem !important; 
+        line-height: 1.2 !important; 
+        min-height: auto !important; 
+        white-space: nowrap !important; 
+        overflow: hidden !important; 
+        text-overflow: ellipsis !important; 
+        word-break: normal !important; 
+        letter-spacing: -0.4px !important; 
+        display: block !important;
+        width: 100% !important;
+      }
+      body.admin-mode .cal-event-text { 
+        font-size: 0.62rem !important;
+        white-space: nowrap !important; 
+        overflow: hidden !important; 
+        text-overflow: ellipsis !important; 
+      }
+      .cal-event-del { font-size: 0.85rem !important; padding: 0 2px !important; line-height: 1 !important; }
+
+      .url-input, .date-input, .time-text-input, .text-input, .select-input, #global-search-input { font-size: 16px !important; }
       .mc-tag-item { padding: 4px 10px; border-radius: 16px; }
       .mc-tag-text { font-size: 0.8rem; }
       .admin-bar { max-width: 95vw; padding: 8px 12px; gap: 8px; bottom: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
@@ -467,7 +941,7 @@
       .admin-status { font-size: 0.75rem; }
     }
 
-    .game-card-item { background: #fff8f9; border: 1.5px solid #ffe0e6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .game-card-item { background: var(--item-bg); border: 1.5px solid var(--item-border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
     .game-title, .game-review-text, .tmi-content-text, .info-text { word-break: break-all; overflow-wrap: break-word; min-width: 0; }
     .admin-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #4a2830; padding: 10px 22px; border-radius: 30px; display: flex; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0, 0.3); z-index: 1000; align-items: center; }
     .admin-bar button { background: transparent; border: none; color: #ffffff; font-weight: 700; font-size: 0.88rem; cursor: pointer; touch-action: manipulation; user-select: none; }
@@ -476,11 +950,11 @@
 
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 40, 48, 0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 2000; }
     .modal-overlay.active { display: flex !important; }
-    .modal-card { background: #ffffff; padding: 24px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 3px solid var(--card-border); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+    .modal-card { background: var(--card-bg); padding: 24px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 3px solid var(--card-border); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
     .modal-card h3 { font-size: 1.1rem; color: var(--accent-color); margin-bottom: 8px; font-weight: 800; }
     .modal-card p { font-size: 0.85rem; color: var(--text-color); margin-bottom: 16px; }
-    .modal-card input[type="password"] { width: 100%; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem; text-align: center; }
-    .modal-card textarea { width: 100%; height: 160px; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 12px; font-size: 0.85rem; resize: none; margin-bottom: 8px; color: var(--text-color); outline: none; }
+    .modal-card input[type="password"] { width: 100%; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem; text-align: center; background: var(--card-bg); color: var(--text-color); }
+    .modal-card textarea { width: 100%; height: 160px; padding: 10px; border: 1.5px solid var(--card-border); border-radius: 12px; font-size: 0.85rem; resize: none; margin-bottom: 8px; color: var(--text-color); background: var(--card-bg); outline: none; }
 
     .color-picker-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 700; font-size: 0.88rem; color: var(--text-color); }
     .color-picker-row input[type="color"] { border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; background: transparent; }
@@ -488,7 +962,7 @@
     .modal-btns { display: flex; gap: 8px; margin-top: 12px; }
     .modal-btns button { flex: 1; padding: 9px 0; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; touch-action: manipulation; user-select: none; }
     .btn-submit { background: var(--accent-color); color: white; }
-    .btn-cancel { background: #ffe4e8; color: var(--text-color); }
+    .btn-cancel { background: var(--item-bg); color: var(--text-color); border: 1px solid var(--card-border); }
     .error-msg { color: #ef4444; font-size: 0.78rem; margin-top: 8px; display: none; }
 
     #game-bio {
@@ -509,110 +983,193 @@
 </head>
 <body>
 
+  <!-- 🎀 우측 하단 둥실둥실 메럿 마스코트 스티커 -->
+  <div class="floating-merot-mascot" title="안녕! 나는 메럿이야 🎀" onclick="alert('초섹시핫바디귀요미핑크공주 메루의 단짝 메럿입니다 🐾')">
+    <img src="mascot.png" id="merot-mascot-img" alt="메럿" onerror="this.src='https://api.iconify.design/fluent-emoji:bear.svg'">
+  </div>
+
   <div class="container">
 
-    <!-- 🔍 실시간 통합 검색바 -->
+    <!-- 🔍 통합 검색바 + 다크모드 버튼 -->
     <div class="search-container">
       <div class="search-input-wrapper">
         <span style="font-size: 1rem;">🔍</span>
         <input type="text" id="global-search-input" placeholder="프로필, 일정, 게임, 업적, TMI 검색..." oninput="handleGlobalSearch(this.value)">
         <button class="search-clear-btn" id="search-clear-btn" onclick="clearGlobalSearch()">×</button>
       </div>
+
+      <button class="dark-mode-btn" id="dark-mode-toggle-btn" onclick="toggleDarkMode()">🌙 다크</button>
       <div class="search-results-dropdown" id="search-results-dropdown"></div>
     </div>
 
     <!-- 탭 네비게이션 -->
     <div class="sheet-tabs">
-      <button class="tab-btn active" onclick="switchTab(event, 'main')">🎀 메인 프로필</button>
-      <button class="tab-btn" onclick="switchTab(event, 'monthly')">📅 월간 일정</button>
-      <button class="tab-btn" onclick="switchTab(event, 'achievements')">🏆 방송업적일대기</button>
-      <button class="tab-btn" onclick="switchTab(event, 'games')">🎮 플레이한 게임</button>
-      <button class="tab-btn" onclick="switchTab(event, 'tmi')">💬 TMI &amp; 여담</button>
+      <button class="tab-btn active" onclick="switchTab(this, 'home')">🏠 홈</button>
+      <button class="tab-btn" onclick="switchTab(this, 'profile')">🎀 프로필</button>
+      <button class="tab-btn" onclick="switchTab(this, 'monthly')">📅 월간일정</button>
+      <button class="tab-btn" onclick="switchTab(this, 'achievements')">🏆 방송업적</button>
+      <button class="tab-btn" onclick="switchTab(this, 'games')">🎮 게임</button>
+      <button class="tab-btn" onclick="switchTab(this, 'tmi')">💬 TMI</button>
     </div>
 
-    <!-- ==================== 시트 1: 메인 프로필 ==================== -->
-    <div class="tab-content active" id="tab-main">
-      <div class="main-columns-grid">
-        <div class="main-col-left">
-          <div class="card main-card-item" id="card-profile-header">
-            <div class="profile">
-              <div class="profile-img-wrapper">
-                <img src="https://via.placeholder.com/100" id="profile-img-element" class="profile-img" alt="프로필">
-                <label for="img-file-input" class="img-upload-btn admin-only">사진 변경 🎀</label>
-                <input type="file" id="img-file-input" accept="image/*,image/gif" style="display:none;" onchange="handleImageUpload(event)">
-              </div>
-              <h1 contenteditable="false" id="profile-name">메루 (MERU)</h1>
-              <div contenteditable="false" class="profile-bio" id="profile-bio">초섹시핫바디귀요미핑크공주 메루입니다</div>
-            </div>
+    <!-- ==================== 시트 1: 🏠 홈 화면 ==================== -->
+    <div class="tab-content active" id="tab-home">
+      <div class="card" style="text-align: center; display: flex; flex-direction: column; gap: 20px; align-items: center;">
+        <h1 style="font-family: 'Pacifico', cursive; font-size: 3.5rem; color: var(--accent-color); letter-spacing: 2px; margin-top: 10px;">MERU</h1>
+        
+        <!-- 대형 배너 사진 (1216 x 832 비율, 큼직하고 시원하게 배치) -->
+        <div class="home-banner-wrapper">
+          <img src="https://via.placeholder.com/1216x832" id="home-banner-img-element" class="home-banner-img" alt="배너 사진">
+          <label for="home-banner-file-input" class="home-banner-upload-btn admin-only">배너 사진 변경 🎀</label>
+          <input type="file" id="home-banner-file-input" accept="image/*" style="display:none;" onchange="handleBannerImageUpload(event)">
+        </div>
+      </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; margin-bottom:8px;">
-              <span style="font-size:0.9rem; font-weight:800; color:var(--accent-color);">📋 프로필 상세 정보</span>
-              <button class="add-btn admin-only" onclick="addProfileInfoItem()">+ 항목 추가</button>
-            </div>
-
-            <div class="profile-info-grid"></div>
+      <!-- 바로가기 & 음악 재생실 개별 독립 2단 그리드 -->
+      <div class="grid-2">
+        <!-- 🔗 바로가기 카드 (독립된 칸) -->
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">🔗 바로가기</div>
+            <button class="add-btn admin-only" onclick="addLink()">+ 추가</button>
           </div>
-
-          <div class="card main-card-item" id="card-links">
-            <div class="section-header">
-              <div class="section-title">🔗 바로가기</div>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
-                <button class="add-btn admin-only" onclick="addLink()">+ 추가</button>
-              </div>
-            </div>
-            <div class="list-wrapper" id="link-list"></div>
-          </div>
+          <div class="list-wrapper" id="link-list"></div>
         </div>
 
-        <div class="main-col-right">
-          <div class="card main-card-item" id="card-schedules">
-            <div class="section-header">
-              <div class="section-title">📅 주간 일정</div>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
-                <button class="add-btn admin-only" onclick="addSchedule()">+ 추가</button>
-              </div>
-            </div>
-            <div class="list-wrapper" id="schedule-list"></div>
+        <!-- 🎵 메루의 음악실 카드 (독립된 칸) -->
+        <div class="card home-music-card">
+          <div class="section-header" style="width: 100%; margin-bottom: 4px;">
+            <div class="section-title">💿 메루의 음악실</div>
           </div>
 
-          <div class="card main-card-item" id="card-anniversaries">
-            <div class="section-header">
-              <div class="section-title">🎉 기념일 (D-Day)</div>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
-                <button class="add-btn admin-only" onclick="addAnniversary()">+ 추가</button>
+          <div class="music-player-container">
+            <div class="cd-disc-wrapper">
+              <div class="cd-disc" id="main-cd-disc">
+                <div class="cd-center-hole"></div>
               </div>
             </div>
-            <div class="list-wrapper" id="anniv-list"></div>
-          </div>
 
-          <div class="card main-card-item" id="card-video">
-            <div class="section-header">
-              <div class="section-title">🎥 대표 영상</div>
-              <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️</button></div>
+            <div class="song-details">
+              <h2 id="display-song-title" style="font-size: 1.1rem; font-weight: 900; color: var(--accent-color);">재생 중인 노래가 없습니다</h2>
+              <p id="display-song-singer" style="font-size: 0.85rem; font-weight: 700; opacity: 0.8;"></p>
             </div>
-            <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; border: 1.5px solid var(--card-border); background: #000000;">
-              <iframe id="main-video-iframe" src="https://vod.sooplive.com/player/204935355" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: none;"></iframe>
-              <video id="main-video-element" controls style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;"></video>
+
+            <audio id="html5-audio-element" onended="skipSong(1)"></audio>
+
+            <div class="player-btn-group">
+              <button class="player-action-btn" onclick="skipSong(-1)" title="이전 곡">⏮️</button>
+              <button class="player-action-btn player-main-play" id="play-pause-ctrl-btn" onclick="togglePlayMusic()">▶️ 재생</button>
+              <button class="player-action-btn" onclick="skipSong(1)" title="다음 곡">⏭️</button>
             </div>
-            <div class="video-edit-box admin-only">
-              <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px;">
-                <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-color); white-space: nowrap;">재생 방식:</span>
-                <select class="select-input" id="video-type-select" style="flex: 1;" onchange="updateVideoPlayer()"><option value="auto" selected="selected">자동 감지 (유튜브 / 스마트 링크)</option><option value="mp4">직접 비디오 파일 링크 (.mp4 / .webm)</option><option value="iframe">웹 임베드 주소 / iframe 링크</option></select>
+
+            <!-- 음량 조절 바 -->
+            <div class="volume-slider-box">
+              <span>🔊 볼륨</span>
+              <input type="range" id="volume-range-input" min="0" max="1" step="0.05" value="1" oninput="changeAudioVolume(this.value)">
+            </div>
+
+            <!-- 재생목록 접기/펼치기 토글 버튼 -->
+            <button class="playlist-toggle-btn" onclick="togglePlaylistAccordion()">🎵 재생목록 펼치기/접기</button>
+            
+            <div class="playlist-accordion-content" id="playlist-accordion-box">
+              <div class="admin-only" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <input type="file" id="cd-image-file" accept="image/*" style="display: none;" onchange="handleCdImageUpload(event)">
+                <label for="cd-image-file" class="add-btn" style="cursor: pointer; font-size: 0.75rem;">🖼️ CD 이미지 업로드</label>
+                <button class="add-btn" onclick="resetCdImage()" style="background: var(--card-bg); font-size: 0.75rem;">기본 CD 초기화</button>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
-                <span style="font-size: 0.8rem; font-weight: 800; color: var(--accent-color);">영상 링크 주소 (URL):</span>
-                <input type="text" class="url-input" id="video-url-input" value="https://vod.sooplive.com/player/204935355" placeholder="유튜브 링크, .mp4 직링크 등 입력" oninput="updateVideoPlayer()">
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span style="font-size: 0.8rem; font-weight: 900; color: var(--accent-color);">플레이리스트</span>
+                <button class="add-btn admin-only" onclick="addSongItem()" style="font-size: 0.75rem;">+ 노래 추가</button>
               </div>
+              <div class="list-wrapper" id="playlist-editor-list" style="gap: 6px;"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== 시트 2: 대형 월간 달력 ==================== -->
+    <!-- ==================== 시트 2: 🎀 프로필 시트 ==================== -->
+    <div class="tab-content" id="tab-profile">
+      <!-- 1단: 프로필 사진 및 상세 정보 카드 -->
+      <div class="card">
+        <div class="profile-layout-flex">
+          <!-- 왼쪽 세로형 (832x1216 비율) 프로필 사진 + 이름 + 소개 -->
+          <div class="profile-left-col">
+            <div class="profile-img-wrapper">
+              <img src="https://via.placeholder.com/832x1216" id="profile-img-element" class="profile-img" alt="프로필">
+              <label for="img-file-input" class="img-upload-btn admin-only">사진 변경</label>
+              <input type="file" id="img-file-input" accept="image/*,image/gif" style="display:none;" onchange="handleImageUpload(event)">
+            </div>
+            <h1 contenteditable="false" id="profile-name">메루 (MERU)</h1>
+            <div contenteditable="false" class="profile-bio" id="profile-bio">초섹시핫바디귀요미핑크공주 메루입니다</div>
+          </div>
+
+          <!-- 오른쪽 상세 정보 그리드 -->
+          <div class="profile-right-col">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.95rem; font-weight:900; color:var(--accent-color);">📋 프로필 상세 정보</span>
+              <button class="add-btn admin-only" onclick="addProfileInfoItem()">+ 항목 추가</button>
+            </div>
+            <div class="profile-info-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2단: 기념일 (D-Day) 칸 (프로필 상세 바로 아래 가로로 넓게 배치) -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title">🎉 기념일 (D-Day)</div>
+          <button class="add-btn admin-only" onclick="addAnniversary()">+ 추가</button>
+        </div>
+        <div class="list-wrapper" id="anniv-list"></div>
+      </div>
+
+      <!-- 3단: 왼쪽 시그니쳐 별풍선(세로형 대형 확장) & 오른쪽 팬캐릭터 + OGQ 스티콘 (2단 그리드) -->
+      <div class="grid-2">
+        <!-- 🎈 왼쪽: 시그니쳐 별풍선 칸 (글자 제거, 세로 확장 및 이미지 꽉 채우기) -->
+        <div class="card">
+          <div class="section-header" style="margin-bottom: 8px;">
+            <div class="section-title">🎈 시그니쳐 별풍선</div>
+          </div>
+          <div class="sig-balloon-box">
+            <div class="sig-balloon-img-wrapper">
+              <img src="https://via.placeholder.com/250x254" id="sig-balloon-img-element" class="sig-balloon-img" alt="시그니쳐 별풍선">
+              <label for="sig-balloon-file-input" class="img-upload-btn admin-only" style="bottom: 8px; right: 8px; font-size: 0.72rem; padding: 5px 10px;">사진 변경</label>
+              <input type="file" id="sig-balloon-file-input" accept="image/*" style="display:none;" onchange="handleSigBalloonImageUpload(event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- 🐾 오른쪽: 팬캐릭터 [메럿] 칸 + 팬캐릭터 밑에 이동된 OGQ 스티콘 칸 -->
+        <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+          <!-- 팬캐릭터 칸 -->
+          <div class="card" style="margin: 0; width: 100%;">
+            <div class="section-header">
+              <div class="section-title">🐾 팬캐릭터 [메럿]</div>
+            </div>
+            <div class="fan-character-box">
+              <div class="fan-char-img-wrapper">
+                <img src="https://via.placeholder.com/100" id="fan-char-img-element" class="fan-char-img" alt="팬캐릭터">
+                <label for="fan-char-file-input" class="img-upload-btn admin-only" style="bottom: -2px; right: -8px;">변경</label>
+                <input type="file" id="fan-char-file-input" accept="image/*" style="display:none;" onchange="handleFanCharImageUpload(event)">
+              </div>
+              <div contenteditable="false" id="fan-char-desc" style="font-size: 0.95rem; font-weight: 700; color: var(--text-color); white-space: pre-wrap; word-break: break-all; width: 100%;">메루 + 페럿을 합친 귀여운 마스코트 팬캐릭터 메럿입니다 🐾</div>
+            </div>
+          </div>
+
+          <!-- 팬캐릭터 밑에 배치된 OGQ 스티콘 & 이모티콘 칸 (한 줄에 3개 고정) -->
+          <div class="card" style="margin: 0; width: 100%;">
+            <div class="section-header">
+              <div class="section-title">🎨 OGQ 스티콘 &amp; 이모티콘</div>
+              <button class="add-btn admin-only" onclick="addOgqItem()">+ OGQ 추가</button>
+            </div>
+            <div class="ogq-grid-container" id="ogq-grid-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== 시트 3: 대형 월간 달력 ==================== -->
     <div class="tab-content" id="tab-monthly">
       <div class="card calendar-container">
         <div class="calendar-header">
@@ -621,19 +1178,19 @@
           <button class="cal-nav-btn" onclick="moveMonth(1)">&gt;</button>
         </div>
         <div class="calendar-grid">
-          <div class="cal-day-name" style="color:#ff4d73;">일</div>
+          <div class="cal-day-name" style="color:var(--accent-color);">일</div>
           <div class="cal-day-name">월</div>
           <div class="cal-day-name">화</div>
           <div class="cal-day-name">수</div>
           <div class="cal-day-name">목</div>
           <div class="cal-day-name">금</div>
-          <div class="cal-day-name" style="color:#ff6b8b;">토</div>
+          <div class="cal-day-name" style="color:var(--accent-color);">토</div>
         </div>
         <div class="calendar-grid" id="calendar-body"></div>
       </div>
     </div>
 
-    <!-- ==================== 시트 3: 🏆 방송업적일대기 ==================== -->
+    <!-- ==================== 시트 4: 🏆 방송업적일대기 ==================== -->
     <div class="tab-content" id="tab-achievements">
       <div class="card">
         <div class="section-header">
@@ -656,7 +1213,7 @@
       </div>
     </div>
 
-    <!-- ==================== 시트 4: 🎮 메루가 플레이한 게임들 ==================== -->
+    <!-- ==================== 시트 5: 🎮 메루가 플레이한 게임들 ==================== -->
     <div class="tab-content" id="tab-games">
       <div class="card">
         <div class="section-title" style="margin-bottom:8px;">💡 게임 소감 &amp; 별점 소개</div>
@@ -676,7 +1233,7 @@
       </div>
     </div>
 
-    <!-- ==================== 시트 5: 💬 TMI & 여담 ==================== -->
+    <!-- ==================== 시트 6: 💬 TMI & 여담 ==================== -->
     <div class="tab-content" id="tab-tmi">
       <div class="card">
         <div class="section-header">
@@ -707,7 +1264,7 @@
     <div class="modal-card">
       <h3 id="evt-detail-date">📅 일정 상세보기</h3>
       <p id="evt-detail-time" style="font-weight:800; color:var(--accent-color); margin-top:4px; margin-bottom:10px; font-size:0.9rem; display:none;"></p>
-      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:#fff8f9; padding:14px; border-radius:14px; border:1.5px solid var(--card-border); text-align:left; white-space:pre-wrap; word-break:break-all; margin-bottom:14px; max-height:280px; overflow-y:auto;"></div>
+      <div id="evt-detail-content" style="font-size:0.92rem; color:var(--text-color); line-height:1.6; background:var(--item-bg); padding:12px; border-radius:14px; border:1.5px solid var(--item-border); text-align:left; max-height:300px; overflow-y:auto;"></div>
       <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('event-detail-modal')">닫기</button></div>
     </div>
   </div>
@@ -745,7 +1302,7 @@
   <div class="modal-overlay" id="theme-modal">
     <div class="modal-card">
       <h3>🎨 테마 색상 커스텀</h3>
-      <div class="color-picker-row"><span>배경 색상:</span><input type="color" id="picker-bg" value="#fff0f5" onchange="applyCustomTheme()"></div>
+      <div class="color-picker-row"><span>배경 색상:</span><input type="color" id="picker-bg" value="#fff8fb" onchange="applyCustomTheme()"></div>
       <div class="color-picker-row"><span>포인트 색상:</span><input type="color" id="picker-accent" value="#ff4d73" onchange="applyCustomTheme()"></div>
       <div class="color-picker-row"><span>글자 색상:</span><input type="color" id="picker-text" value="#5c3a42" onchange="applyCustomTheme()"></div>
       <div class="color-picker-row"><span>시트 탭 글자 색상:</span><input type="color" id="picker-tab-text" value="#ff758c" onchange="applyCustomTheme()"></div>
@@ -759,7 +1316,7 @@
   <!-- 📋 모달: 다목적 여러 줄 붙여넣기 -->
   <div class="modal-overlay" id="bulk-paste-modal">
     <div class="modal-card">
-      <h3 id="bulk-paste-title">📋 여러 줄 한 번에 붙여넣기</h3>
+      <h3>📋 여러 줄 한 번에 붙여넣기</h3>
       <textarea id="bulk-paste-text" placeholder="내용을 여기에 붙여넣으세요..."></textarea>
       <div class="modal-btns">
         <button class="btn-submit" onclick="applyBulkPaste()">생성하기</button>
@@ -769,11 +1326,262 @@
   </div>
 
   <script>
-    /* 🛡️ 전역 예외 방어 가드 */
+    /* 🛡 전역 예외 방어 가드 */
     window.onerror = function(msg, url, line) {
       console.warn("방어된 스크립트 예외:", msg, "line:", line);
       return true;
     };
+
+    /* 🌙 다크모드 토글 및 유지 관리자 */
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      try { localStorage.setItem('is_dark_mode', isDark ? 'true' : 'false'); } catch(e) {}
+      const btn = document.getElementById('dark-mode-toggle-btn');
+      if (btn) btn.textContent = isDark ? '☀️ 라이트' : '🌙 다크';
+    }
+
+    function initDarkMode() {
+      try {
+        if (localStorage.getItem('is_dark_mode') === 'true') {
+          document.body.classList.add('dark-mode');
+          const btn = document.getElementById('dark-mode-toggle-btn');
+          if (btn) btn.textContent = '☀️ 라이트';
+        }
+      } catch(e) {}
+    }
+
+    /* 💽 음악 재생 플레이어 상태 및 로직 (음량 조절 추가) */
+    let musicState = {
+      cdImg: "",
+      currentIndex: 0,
+      isPlaying: false,
+      volume: 1,
+      songs: [
+        ["Snow halation", "Aqours", "song1.mp3"],
+        ["FULL MOON", "메루", "song2.mp3"]
+      ]
+    };
+
+    function changeAudioVolume(val) {
+      const audioEl = document.getElementById('html5-audio-element');
+      const v = parseFloat(val);
+      musicState.volume = v;
+      if (audioEl) audioEl.volume = v;
+      triggerAutoSave();
+    }
+
+    function togglePlaylistAccordion() {
+      const box = document.getElementById('playlist-accordion-box');
+      if (box) box.classList.toggle('open');
+    }
+
+    function updateMusicPlayerUI() {
+      const titleEl = document.getElementById('display-song-title');
+      const singerEl = document.getElementById('display-song-singer');
+      const cdDisc = document.getElementById('main-cd-disc');
+      const playBtn = document.getElementById('play-pause-ctrl-btn');
+      const volRange = document.getElementById('volume-range-input');
+
+      if (volRange && musicState.volume !== undefined) {
+        volRange.value = musicState.volume;
+      }
+
+      const songs = musicState.songs || [];
+      if (songs.length === 0) {
+        if (titleEl) titleEl.textContent = "재생할 노래가 없습니다";
+        if (singerEl) singerEl.textContent = "";
+        return;
+      }
+
+      if (musicState.currentIndex < 0) musicState.currentIndex = songs.length - 1;
+      if (musicState.currentIndex >= songs.length) musicState.currentIndex = 0;
+
+      const current = songs[musicState.currentIndex];
+      const title = current[0] || '제목 없음';
+      const singer = current[1] || '가수 미상';
+
+      if (titleEl) titleEl.textContent = title;
+      if (singerEl) singerEl.textContent = singer;
+
+      if (cdDisc) {
+        if (musicState.cdImg) {
+          cdDisc.style.backgroundImage = `url(${musicState.cdImg})`;
+          cdDisc.style.backgroundColor = 'transparent';
+        } else {
+          cdDisc.style.backgroundImage = 'none';
+          cdDisc.style.backgroundColor = '#222';
+        }
+        if (musicState.isPlaying) {
+          cdDisc.classList.add('spinning');
+          if (playBtn) playBtn.textContent = '⏸️ 일시정지';
+        } else {
+          cdDisc.classList.remove('spinning');
+          if (playBtn) playBtn.textContent = '▶️ 재생';
+        }
+      }
+    }
+
+    function togglePlayMusic() {
+      const audioEl = document.getElementById('html5-audio-element');
+      const songs = musicState.songs || [];
+      if (songs.length === 0) return;
+
+      if (musicState.isPlaying) {
+        audioEl.pause();
+        musicState.isPlaying = false;
+      } else {
+        const currentPath = songs[musicState.currentIndex][2] || '';
+        if (audioEl.src !== currentPath && currentPath) {
+          audioEl.src = currentPath;
+        }
+        audioEl.volume = musicState.volume !== undefined ? musicState.volume : 1;
+        audioEl.play().then(() => {
+          musicState.isPlaying = true;
+          updateMusicPlayerUI();
+        }).catch(err => {
+          alert('오디오 재생 실패: 깃허브에 파일이 정상적으로 업로드되었는지, 경로가 올바른지 확인해주세요.');
+          musicState.isPlaying = false;
+          updateMusicPlayerUI();
+        });
+      }
+      updateMusicPlayerUI();
+    }
+
+    function skipSong(direction) {
+      const audioEl = document.getElementById('html5-audio-element');
+      musicState.currentIndex += direction;
+      const songs = musicState.songs || [];
+      if (musicState.currentIndex < 0) musicState.currentIndex = songs.length - 1;
+      if (musicState.currentIndex >= songs.length) musicState.currentIndex = 0;
+
+      audioEl.pause();
+      musicState.isPlaying = false;
+      updateMusicPlayerUI();
+
+      if (songs.length > 0 && songs[musicState.currentIndex][2]) {
+        audioEl.src = songs[musicState.currentIndex][2];
+        audioEl.volume = musicState.volume !== undefined ? musicState.volume : 1;
+        audioEl.play().then(() => {
+          musicState.isPlaying = true;
+          updateMusicPlayerUI();
+        }).catch(e => {});
+      }
+    }
+
+    function handleCdImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800; canvas.height = 800;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, 800, 800);
+            const compressed = canvas.toDataURL('image/jpeg', 0.92);
+            musicState.cdImg = compressed;
+            updateMusicPlayerUI();
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function resetCdImage() {
+      musicState.cdImg = "";
+      updateMusicPlayerUI();
+      triggerAutoSave();
+    }
+
+    function renderPlaylistEditor() {
+      const listEl = document.getElementById('playlist-editor-list');
+      if (!listEl) return;
+      const songs = musicState.songs || [];
+      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
+
+      if (!isAdmin) {
+        listEl.innerHTML = songs.map((song, idx) => `
+          <div class="item-row" style="padding: 10px 14px; justify-content: space-between; align-items: center; background: var(--item-bg); border-radius: 14px; border: 1.5px solid var(--item-border);">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+              <span style="font-weight: 800; color: var(--accent-color); font-size: 0.78rem;">#${idx + 1}</span>
+              <span style="font-weight: 700; color: var(--text-color); font-size: 0.86rem; word-break: break-all;">${escapeHtml(song[0])}</span>
+            </div>
+            <span style="font-weight: 700; opacity: 0.75; font-size: 0.8rem; white-space: nowrap; margin-left: 8px;">${escapeHtml(song[1])}</span>
+          </div>
+        `).join('');
+      } else {
+        listEl.innerHTML = songs.map((song, idx) => `
+          <div class="item-row playlist-row" data-index="${idx}" style="flex-direction:column; align-items:flex-start; gap:6px; padding:10px 12px;">
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+              <span style="font-weight:900; color:var(--accent-color); font-size:0.78rem;">🎵 TRACK #${idx + 1}</span>
+              <div style="display:flex; gap:4px;">
+                <button class="move-btn" onclick="moveSongUp(${idx})">⬆️</button>
+                <button class="move-btn" onclick="moveSongDown(${idx})">⬇️</button>
+                <button class="del-btn" onclick="removeSong(${idx})">×</button>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px; width:100%;">
+              <input type="text" class="text-input song-title-input" value="${escapeAttr(song[0])}" placeholder="노래 제목" oninput="updatePlaylistFromDOM(); triggerAutoSave();" style="flex:1; padding:6px 10px; font-size:0.8rem;">
+              <input type="text" class="text-input song-singer-input" value="${escapeAttr(song[1])}" placeholder="가수" oninput="updatePlaylistFromDOM(); triggerAutoSave();" style="width:90px; padding:6px 10px; font-size:0.8rem;">
+            </div>
+            <input type="text" class="url-input song-url-input" value="${escapeAttr(song[2])}" placeholder="GitHub 파일명 (song1.mp3)" oninput="updatePlaylistFromDOM(); triggerAutoSave();" style="padding:6px 10px; font-size:0.8rem;">
+          </div>
+        `).join('');
+      }
+    }
+
+    function addSongItem() {
+      if (!musicState.songs) musicState.songs = [];
+      musicState.songs.push(["새 노래 제목", "가수 이름", "song.mp3"]);
+      renderPlaylistEditor();
+      triggerAutoSave();
+    }
+
+    function removeSong(idx) {
+      musicState.songs.splice(idx, 1);
+      renderPlaylistEditor();
+      updateMusicPlayerUI();
+      triggerAutoSave();
+    }
+
+    function moveSongUp(idx) {
+      if (idx > 0) {
+        const temp = musicState.songs[idx];
+        musicState.songs[idx] = musicState.songs[idx - 1];
+        musicState.songs[idx - 1] = temp;
+        renderPlaylistEditor();
+        triggerAutoSave();
+      }
+    }
+
+    function moveSongDown(idx) {
+      const songs = musicState.songs || [];
+      if (idx < songs.length - 1) {
+        const temp = musicState.songs[idx];
+        musicState.songs[idx] = musicState.songs[idx + 1];
+        musicState.songs[idx + 1] = temp;
+        renderPlaylistEditor();
+        triggerAutoSave();
+      }
+    }
+
+    function updatePlaylistFromDOM() {
+      const rows = document.querySelectorAll('.playlist-row');
+      const newSongs = [];
+      rows.forEach(row => {
+        const title = row.querySelector('.song-title-input')?.value.trim() || '';
+        const singer = row.querySelector('.song-singer-input')?.value.trim() || '';
+        const url = row.querySelector('.song-url-input')?.value.trim() || '';
+        if (title || url) newSongs.push([title, singer, url]);
+      });
+      musicState.songs = newSongs;
+    }
 
     /* 💡 관리자 세션 상태 안전 관리자 (Fail-Safe Storage) */
     function getAdminState() {
@@ -790,7 +1598,7 @@
       try { sessionStorage.setItem('is_admin_active', str); } catch(e) {}
     }
 
-    /* 💡 YYYY-MM-DD 표준 변환 보조 함수 */
+    /* 💡 YYYY-MM-DD 표준 변환 보조 함수 (월간일정 오류 완전 해결) */
     function formatYMD(dateStr) {
       if (!dateStr) return '';
       let clean = String(dateStr).trim().replace(/\s+/g, '').replace(/\./g, '-').replace(/\//g, '-');
@@ -800,9 +1608,9 @@
       const parts = clean.split('-');
       if (parts.length === 3) {
         const y = parts[0];
-        const m = parts[1].padStart(2, '0');
-        const d = parts[2].replace(/[^\d].*/, '').padStart(2, '0');
-        if (/^\d{4}$/.test(y) && /^\d{2}$/.test(m) && /^\d{2}$/.test(d)) {
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2].replace(/[^\d].*/, ''), 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
           return `${y}-${m}-${d}`;
         }
       }
@@ -857,7 +1665,7 @@
       if (!dateStr) return '01.01';
       const clean = formatYMD(dateStr);
       const parts = clean.split('-');
-      return parts.length === 3 ? `${parts[1].padStart(2, '0')}.${parts[2].padStart(2, '0')}` : dateStr;
+      return parts.length === 3 ? `${String(parts[1]).padStart(2, '0')}.${String(parts[2]).padStart(2, '0')}` : dateStr;
     }
 
     function escapeHtml(str) { 
@@ -881,7 +1689,7 @@
     }
 
     function getCleanPlainText(str) {
-      if (!str) return '';
+      if (!str) return ''; 
       return String(str)
         .replace(/<[^>]*>/g, '')
         .replace(/&nbsp;/gi, '')
@@ -1010,18 +1818,24 @@
 
     function closeModal(id) { 
       const modal = document.getElementById(id); 
-      if (modal) modal.classList.remove('active'); 
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
       updateBodyScrollLock();
     }
 
     function openModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add('active');
+      const modal = document.getElementById(id); 
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+      }
       updateBodyScrollLock();
     }
 
     const ImageStore = {
-      dbName: 'ProfileImgDB_v3', storeName: 'images',
+      dbName: 'ProfileImgDB_v5', storeName: 'images',
       openDB: function() {
         return new Promise((resolve, reject) => {
           const req = indexedDB.open(this.dbName, 1);
@@ -1073,16 +1887,21 @@
 
     let calendarEvents = {"2026-8-21":[{"time":"20:00","text":"메루2.0 공개"}],"2026-8-22":[{"time":"","text":"휴방"}],"2026-8-23":[{"time":"22:40","text":"리애니멀DLC w.라무"}],"2026-8-24":[{"time":"","text":"정기휴방"},{"time":"","text":"픽셀동회의"}],"2026-8-27":[{"time":"19:00","text":"태풍에서 살아남기w.지력"}],"2026-8-30":[{"time":"21:30","text":"공겜동"}]};
     let isFirebaseSaving = false, autoSaveTimer = null, currentBulkPasteTarget = 'achievements';
-    let tempOriginalTheme = { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
+    let tempOriginalTheme = { bg: '#fff8fb', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
 
     const DEFAULT_GAME_BIO = "⭐ 별 기준 (그치만 내 기준이라 취향탈수도 있음)<br>✔ 클리어 체크<br>6개 &gt; 2번 플레이해도 재밌을 것 같은 게임<br>4~5개 &gt; 남에게 추천하고 싶은 게임<br>3개 &gt; 무난함 한번 해봐도 괜찮은 게임<br>2개 &gt; 똥겜의 맛을 느끼고싶다면 추천<br>1개 &gt; 돈주고 사기 아까운 게임";
 
     let storeData = {
       profile: { name: "메루 (MERU)", bio: "초섹시핫바디귀요미핑크공주 메루입니다", img: "" },
+      homeBanner: "",
+      sigBalloonImg: "",
+      ogqList: [
+        ["https://api.iconify.design/fluent-emoji:sparkles.svg", "https://sooplive.co.kr"],
+        ["https://api.iconify.design/fluent-emoji:heart.svg", "https://cafe.naver.com/cutemeru"]
+      ],
+      fanChar: { img: "", desc: "메루 + 페럿을 합친 귀여운 마스코트 팬캐릭터 메럿입니다 🐾" },
       gameBio: DEFAULT_GAME_BIO,
-      theme: { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' },
-      videoUrl: "https://vod.sooplive.com/player/204935355",
-      videoType: "auto",
+      theme: { bg: '#fff8fb', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' },
       infoGrid: [
         ["이름", "메루", false], ["나이", "비공개", false], ["생일", "06월 17일", false], ["키 / 몸무게", "201cm / 201KG", false],
         ["MBTI", "INSFP", false], ["팬네임", "메럿", false], ["첫방송", "2024.02.10", false], ["방송일차", "927일차 🎉", false],
@@ -1093,14 +1912,11 @@
         ["메루유튜브", "https://www.youtube.com/@_merurun"], ["메루띠띠", "https://www.youtube.com/@%EB%A9%94%EB%A3%A8%ED%8C%AC%EC%B1%84%EB%84%90"],
         ["팬심", "https://fancim.me/celeb/profile.aspx?cu_id=meuuu3"]
       ],
-      schedules: [
-        ["목요일", "메하싶데이", "PM", "?"], ["월요일", "정기휴방/픽셀동회의", "PM", "휴방"],
-        ["목요일", "태풍에서 살아남기w.지력", "PM", "19:00"], ["일요일", "공겜동", "PM", "21:30"]
-      ],
       anniversaries: [["2026-11-05", "1000일"]],
       mcServers: ["랜드마꾸", "버니버스", "마카오톡", "레오펠", "숲길", "호구와트", "마령전(퍼가욤)", "오함마3(납득단)", "마친다", "돌발서", "맹든링", "하루살이", "충동서버", "린코레일2", "삼국지", "후국지", "오프라인"],
       achievements: [
-        ["20240210", "첫 방송 시작 (므3므)"],["20240315", "므3므 > 메루 닉네임 변경 / 립모션 공개"],["20240405", "고정 컨텐츠 매주 금요일 그림 핀볼 이벤트 시작"],["20240410", "첫 VR 풀트"],["20240428", "시청자 70명 달성"],["20240429", "나작버 유튜브 올라간 날"],["20240530", "랜드마꾸 춘밭런 1위"],["20240604", "팬 캐릭터 [메럿] 공개 · 메루 + 페럿"],["20240620", "SOOP 테일즈런너 대회 1위"],["20240621", "더파이널스 대회 이벤트전 1위"],["20240622", "물초코고 대 운동회 3위"],["20240704", "PUBG 플레이그라운드 제 1/2회 1위"],["20240705", "뉴비존 201기 선정"],["20240707", "러브라이브 노래 대회 코스프레 1위"],["20240712", "랜드마꾸 미니게임 파라다이스 1위"],["20240713", "VALORANT 철들의 전쟁 대회 1위"],["20240715", "SOOP 숲챌린지 최종 공동 2위"],["20240718", "뉴메루 공개"],["20240720", "PUBG SR 플레이 그라운드 2위"],["20240727", "봉준 고멤 오디션 참가"],["20240727", "실시간 검색어 4위"],["20240801", "랜드마꾸 마르텔 PVP 2위"],["20240902", "마카오톡 [츄릅] 길드 입성"],["20240921", "럭키마리시티 점프맵 1위"],["20241004", "[너메보] 고정 컨텐츠 시작"],["20241015", "폴가이즈 버종대 참가"],["20241016", "버니버스 방탈출 1위"],["20241108", "VOD BJ 달성"],["20241209", "VOD 브론즈 달성"],["20241224", "세이버즈 뽑기"],["20250110", "메이플스토리 6차 전직"],["20250112", "베스트 스트리머 첫 도전"],["20250131", "베스트 스트리머 달성 ★"],["20250210", "1주년 방송에서 첫 10,000개"],["20250210", "1주년 방송에서 첫 100두산"],["20250215", "겟투워크 CEO 첫트 클리어 7:44:56 / 히든 엔딩 8:27:25"],["20250222", "로볼록스 등산대회 3위"],["20250302", "Make Good Choices 1분 23초 클리어"],["20250331", "뉴뉴메루 공개 · 첫 멜리고 풀트"],["20250402", "파티애니멀즈 버종대 참가"],["20250405", "꼬맨틀 8트 컷"],["20250403", "팬카페 개설 - 깅메루 pump it up"],["20250415", "메루 팬카페 씨앗 3단계 달성"],["20250420", "[컵치킨배] 마크 대회 폴가이즈 2관왕"],["20250420", "[컵치킨배] 마크 대회 최종 1위 (10팀)"],["20250430", "메루 팬카페 씨앗 5단계 달성"],["20250515", "메루 팬카페 새싹 2단계 달성"],["20250524", "크레비쥬 모션캡쳐 콘서트 [숲퍼소닉] 1회 게스트 숲퍼소닉"],["20250527", "메이플 차원의숲 1스테이지 1:17:00 클리어"],["20250531", "메루 팬카페 새싹 4단계 달성"],["20250615", "메루 팬카페 잎새 1단계 달성 🌱"],["20250616", "물초코 체육대회 단체전 1등 / 팀전 1등"],["20250617", "SOOP 실시간 검색어 2위"],["20250617", "방송에서 맞이하는 2번째 생일"],["20250706", "[레오펠] 중력의탑 4번째로 클리어"],["20250814", "[마령전] 퍼가욤 3위 w. 퍼드 파이브 희희덕 나린인데 이낭 서라 숙봉 호미밍 민초희"],["20250814", "[마령전] 개인전 1위"],["20250814", "[마령전] 전체 킬 등수 6위"],["20250830", "뉴냥이배 폴가이즈3 대회 팀전 1등 (팀 114점 / 개인점수 57점)"],["20250822", "[오함마] 1차 합격"],["20250824", "[오함마] 물초코네 문파 [납득단] 합격 w. 물초코 유시에 라무"],["20250909", "메루 팬카페 50명 달성 !!"],["20250911", "[지력사무소] 2기 합격 🎉"],["20250912", "즐찾 1700명 달성"],["20250914", "즐찾 1800명 달성"],["20250915", "즐찾 1900 달성"],["20250916", "[황새오래걷기게임] 최고기록 187m"],["20250917", "[니즈배] 페스트펭귄 1위 (2회)"],["20251004", "[마친다] PVP 토너먼트 1위"],["20251004", "[마친다] 점프맵 타임어택 1:21초 타임어택 영상"],["20251016", "[지력] 더헌터 CK 1위"],["20251018", "[지력] 러시안 피싱 CK 우승"],["20251026", "[육창서버] 러스트 [지창팀] 최종 3위 w. 지력사무소"],["20251026", "[육창서버] 러스트 K/DA 순위 최종 1위 195킬 29데스"],["20251026", "[지육대] 지력사무소 최종 1위"],["20251111", "[돌발서버] PVP 투기장 1위"],["20251113", "[돌발서버] 다이아 CK 우승"],["20251118", "[돌발서버] 지(만)편한세상 완공"],["20251118", "[돌발서버] 세구라이더 예선전 1위"],["20251118", "[돌발서버] 세구라이더 결승전 1위"],["20251122", "[화석게임대전] 크아 이벤트전 1위"],["20251123", "[마크화살전쟁: 메가진화] 1위"],["20251201", "[맹든링] in100"],["20251203", "[맹든링: 파국] 1일차 w. 파이브 트할 학살 견자희 히츠메 차밍챠 온자두 꽃님 따스히 슨미 퍼드"],["20251207", "[맹든링: 파국] 길드 PVP 대회 2위"],["20251208", "[맹든링: 파국] 서리호수 퍼클"],["20251208", "[맹든링: 파국] 축축한동굴 퍼클"],["20251210", "[맹든링: 파국] 히든 (디코로 목격)"],["20251219", "[맹든링: 파국] wasd 최단기록 달성"],["20251223", "[맹든링: 파국] 3계층주 써드 선클"],["20251224", "[맹든링] 세기말 PVP 우승 팀"],["20251224", "[맹든링: 파국] 부유성 솔클"],["20251224", "[맹든링: 파국] 최다 퍼클 완주 6퍼클 2세컨 3써드"],["20251223", "[팬카페] 잎새 5단계 달성 🌱"],["20251229", "[팬카페] 100명 달성"],["20260111", "[더헌터] 알비노 희귀 퓨마 서버 최초 사냥 인줄 알았는데 그레이였음"],["20260120", "[팬카페] 가지 2단계 달성"],["20260122", "[종겜크루대전] 황새오래걷기 100m 승리 다시보기"],["20260122", "[종겜크루대전] 파워알까기 1:1 승리"],["20260122", "[종겜크루대전] 피코파크 팀전 승리"],["20260122", "[종겜크루대전] 폴가이즈 3관왕"],["20260122", "[지력사무소 VS 강씨세가] 종겜크루대전 최종 우승 🏆"],["20260207", "[언더테일] 샌즈전 15트클"],["20260210", "[2주년] 방송 🎉"],["20260223", "즐겨찾기 3000 달성"],["20260228", "[똥겜CK] SUPER SORRY 1위"],["20260301", "[첫 게임 대회] Ball&Roll 스피드런 대회 다시보기"],["20260301", "[패들패들패들] 1:17분 컷 w.목츄리"],["20260302", "[엘든링] 트리 가드 2시간 30분 컷"],["20260303", "[팬카페] 스타 뱃지 달림 !"],["20260307", "[패들패들패들] 50분 42초 1위 w.목츄리"],["20260307", "[테일즈런너] 숲 봄맞이 마라톤 2위"],["20260311", "[쌀레나] 2.5회차 최종 1위 w. 정다니 김쿼카 마늘빵 쨈도은"],["20260313", "[쌀레나] 크루대전 지력사무소 최종 1위 w. 지피티 라무 김쿼카 한아련"],["20260406", "[충동서버] 지력사무소 최종 3위"],["20260414", "[지력사무소] 키캡 숲토어 판매"],["20260414", "[지력사무소] 키캡 판매율 best 1~4위 달성"],["20260426", "황새걷기게임 199m 달성"],["20260427", "[지력사무소 VS 홍신소] 종겜크루대전 승리 🏆"],["20260428", "[쌀레나] 5회차 최종 1위 w. 트할, 희꾸미, 차투리, 새잎"],["20260502", "[디아블로2] 악몽 하드코어 1호기 클리어"],["20260502", "[지의시련] 클리어 ★"],["20260508", "[메의시련] 사과게임 + 황새 동시에 플레이하기 42점 + 48m"],["20260521", "[지력사무소] 2기 검색 배너 제작 배너 보기"],["20260521", "[지피티] 지피티 팬카페 디자인 스탭"],["20260524", "[엉망칠창] RUST 서버 전체 킬 3위, K/DA 5위 w. 지력사무소"],["20260524", "[미밍서버] RUST 최종 공동 1위 w. 린코 물초코 멍지수 나몽 이상훈 빈쫑"],["20260524", "[미밍서버] RUST 전체 킬 순위 1위 120킬 71데스"],["20260524", "[감니버스] 종겜올림픽 황새오래걷기 236m 금메달 🥇 다시보기"],["20260524", "[감니버스] 종겜올림픽 폴가이즈 금메달 🥇"],["20260524", "[감니버스] 종겜올림픽 최종 1위 3금 2은 🏆 w. 지력사무소"],["20260612", "[아크레이더스] 1주차 최종 1위 w. 지력사무소"],["20260617", "[메루] 오리지널 아바타 공개"],["20260619", "[아크레이더스] 2주차 최종 1위 w. 지력사무소"],["20260626", "[아크레이더스] 3주차 최종 1위 w. 지력사무소"],["20260629", "[린창서버] 최종 공동 1등 w. 지력사무소"],["20260717", "[지력사무소] 오락관 우승 w. 지피티 싱유 린코 이투"],["20260709", "[폴가이즈] 국가대항전 우승 w. 지력"],["20260806", "[삼국지] 적토마 모험히든 발견"],["20260809", "[후국지] 적토마 +10강 모험히든 발견"]
+        ["20240210", "첫 방송 시작 (므3므)"],["20240315", "므3므 > 메루 닉네임 변경 / 립모션 공개"],["20240405", "고정 컨텐츠 매주 금요일 그림 핀볼 이벤트 시작"],["20240410", "첫 VR 풀트"],["20240428", "시청자 70명 달성"],["20240429", "나작버 유튜브 올라간 날"],["20240530", "랜드마꾸 춘밭런 1위"],["20240604", "팬 캐릭터 [메럿] 공개 · 메루 + 페럿"],["20240620", "SOOP 테일즈런너 대회 1위"],["20240621", "더파이널스 대회 이벤트전 1위"],["20240622", "물초코고 대 운동회 3위"],["20240704", "PUBG 플레이그라운드 제 1/2회 1위"],["20240705", "뉴비존 201기 선정"],["20240707", "러브라이브 노래 대회 코스프레 1위"],["20240712", "랜드마꾸 미니게임 파라다이스 1위"],["20240713", "VALORANT 철들의 전쟁 대회 1위"],["20240715", "SOOP 숲챌린지 최종 공동 2위"],["20240718", "뉴메루 공개"],["20240720", "PUBG SR 플레이 그라운드 2위"],["20240727", "봉준 고멤 오디션 참가"],["20240727", "실시간 검색어 4위"],["20240801", "랜드마꾸 마르텔 PVP 2위"],["20240902", "마카오톡 [츄릅] 길드 입성"],["20240921", "럭키마리시티 점프맵 1위"],["20241004", "[너메보] 고정 컨텐츠 시작"],["20241015", "폴가이즈 버종대 참가"],["20241016", "버니버스 방탈출 1위"],["20241108", "VOD BJ 달성"],["20241209", "VOD 브론즈 달성"],["20241224", "세이버즈 뽑기"],["20250110", "메이플스토리 6차 전직"],["20250112", "베스트 스트리머 첫 도전"],["20250131", "베스트 스트리머 달성 ★"],["20250210", "1주년 방송에서 첫 10,000개"],["20250210", "1주년 방송에서 첫 100두산"],["20250215", "겟투워크 CEO 첫트 클리어 7:44:56 / 히든 엔딩 8:27:25"],["20250222", "로볼록스 등산대회 3위"],["20250302", "Make Good Choices 1분 23초 클리어"],["20250331", "뉴뉴메루 공개 · 첫 멜리고 풀트"],["20250402", "파티애니멀즈 버종대 참가"],["20250405", "꼬맨틀 8트 컷"],["20250403", "팬카페 개설 - 깅메루 pump it up"],["20250415", "메루 팬카페 씨앗 3단계 달성"],["20250420", "[컵치킨배] 마크 대회 폴가이즈 2관왕"],["20250420", "[컵치킨배] 마크 대회 최종 1위 (10팀)"],["20250430", "메루 팬카페 씨앗 5단계 달성"],["20250515", "메루 팬카페 새싹 2단계 달성"],["20250524", "크레비쥬 모션캡쳐 콘서트 [숲퍼소닉] 1회 게스트 숲퍼소닉"],["20250527", "메이플 차원의숲 1스테이지 1:17:00 클리어"],["20250531", "메루 팬카페 새싹 4단계 달성"],["20250615", "메루 팬카페 잎새 1단계 달성 🌱"],["20250616", "물초코 체육대회 단체전 1등 / 팀전 1등"],["20250617", "SOOP 실시간 검색어 2위"],["20250617", "방송에서 맞이하는 2번째 생일"],["20250706", "[레오펠] 중력의탑 4번째로 클리어"],
+        ["20250814", "[마령전] 퍼가욤 3위 w. 퍼드 파이브 희희덕 나린인데 이낭 서라 숙봉 호미밍 민초희"],["20250814", "[마령전] 개인전 1위"],["20250814", "[마령전] 전체 킬 등수 6위"],["20250830", "뉴냥이배 폴가이즈3 대회 팀전 1등 (팀 114점 / 개인점수 57점)"],["20250822", "[오함마] 1차 합격"],["20250824", "[오함마] 물초코네 문파 [납득단] 합격 w. 물초코 유시에 라무"],["20250909", "메루 팬카페 50명 달성 !!"],["20250911", "[지력사무소] 2기 합격 🎉"],["20250912", "즐찾 1700명 달성"],["20250914", "즐찾 1800명 달성"],["20250915", "즐찾 1900 달성"],["20250916", "[황새오래걷기게임] 최고기록 187m"],["20250917", "[니즈배] 페스트펭귄 1위 (2회)"],["20251004", "[마친다] PVP 토너먼트 1위"],["20251004", "[마친다] 점프맵 타임어택 1:21초 타임어택 영상"],["20251016", "[지력] 더헌터 CK 1위"],["20251018", "[지력] 러시안 피싱 CK 우승"],["20251026", "[육창서버] 러스트 [지창팀] 최종 3위 w. 지력사무소"],["20251026", "[육창서버] 러스트 K/DA 순위 최종 1위 195킬 29데스"],["20251026", "[지육대] 지력사무소 최종 1위"],["20251111", "[돌발서버] PVP 투기장 1위"],["20251113", "[돌발서버] 다이아 CK 우승"],["20251118", "[돌발서버] 지(만)편한세상 완공"],["20251118", "[돌발서버] 세구라이더 예선전 1위"],["20251118", "[돌발서버] 세구라이더 결승전 1위"],["20251122", "[화석게임대전] 크아 이벤트전 1위"],["20251123", "[마크화살전쟁: 메가진화] 1위"],["20251201", "[맹든링] in100"],["20251203", "[맹든링: 파국] 1일차 w. 파이브 트할 학살 견자희 히츠메 차밍챠 온자두 꽃님 따스히 슨미 퍼드"],["20251207", "[맹든링: 파국] 길드 PVP 대회 2위"],["20251208", "[맹든링: 파국] 서리호수 퍼클"],["20251208", "[맹든링: 파국] 축축한동굴 퍼클"],["20251210", "[맹든링: 파국] 히든 (디코로 목격)"],["20251219", "[맹든링: 파국] wasd 최단기록 달성"],["20251223", "[맹든링: 파국] 3계층주 써드 선클"],["20251224", "[맹든링] 세기말 PVP 우승 팀"],["20251224", "[맹든링: 파국] 부유성 솔클"],["20251224", "[맹든링: 파국] 최다 퍼클 완주 6퍼클 2세컨 3써드"],["20251223", "[팬카페] 잎새 5단계 달성 🌱"],["20251229", "[팬카페] 100명 달성"],["20260111", "[더헌터] 알비노 희귀 퓨마 서버 최초 사냥 인줄 알았는데 그레이였음"],["20260120", "[팬카페] 가지 2단계 달성"],["20260122", "[종겜크루대전] 황새오래걷기 100m 승리 다시보기"],["20260122", "[종겜크루대전] 파워알까기 1:1 승리"],["20260122", "[종겜크루대전] 피코파크 팀전 승리"],["20260122", "[종겜크루대전] 폴가이즈 3관왕"],["20260122", "[지력사무소 VS 강씨세가] 종겜크루대전 최종 우승 🏆"],["20260207", "[언더테일] 샌즈전 15트클"],["20260210", "[2주년] 방송 🎉"],["20260223", "즐겨찾기 3000 달성"],["20260228", "[똥겜CK] SUPER SORRY 1위"],["20260301", "[첫 게임 대회] Ball&Roll 스피드런 대회 다시보기"],["20260301", "[패들패들패들] 1:17분 컷 w.목츄리"],["20260302", "[엘든링] 트리 가드 2시간 30분 컷"],["20260303", "[팬카페] 스타 뱃지 달림 !"],["20260307", "[패들패들패들] 50분 42초 1위 w.목츄리"],["20260307", "[테일즈런너] 숲 봄맞이 마라톤 2위"],["20260311", "[쌀레나] 2.5회차 최종 1위 w. 정다니 김쿼카 마늘빵 쨈도은"],["20260313", "[쌀레나] 크루대전 지력사무소 최종 1위 w. 지피티 라무 김쿼카 한아련"],["20260406", "[충동서버] 지력사무소 최종 3위"],["20260414", "[지력사무소] 키캡 숲토어 판매"],["20260414", "[지력사무소] 키캡 판매율 best 1~4위 달성"],["20260426", "황새걷기게임 199m 달성"],["20260427", "[지력사무소 VS 홍신소] 종겜크루대전 승리 🏆"],["20260428", "[쌀레나] 5회차 최종 1위 w. 트할, 희꾸미, 차투리, 새잎"],["20260502", "[디아블로2] 악몽 하드코어 1호기 클리어"],["20260502", "[지의시련] 클리어 ★"],["20260508", "[메의시련] 사과게임 + 황새 동시에 플레이하기 42점 + 48m"],["20260521", "[지력사무소] 2기 검색 배너 제작 배너 보기"],["20260521", "[지피티] 지피티 팬카페 디자인 스탭"],["20260524", "[엉망칠창] RUST 서버 전체 킬 3위, K/DA 5위 w. 지력사무소"],["20260524", "[미밍서버] RUST 최종 공동 1위 w. 린코 물초코 멍지수 나몽 이상훈 빈쫑"],["20260524", "[미밍서버] RUST 전체 킬 순위 1위 120킬 71데스"],["20260524", "[감니버스] 종겜올림픽 황새오래걷기 236m 금메달 🥇 다시보기"],["20260524", "[감니버스] 종겜올림픽 폴가이즈 금메달 🥇"],["20260524", "[감니버스] 종겜올림픽 최종 1위 3금 2은 🏆 w. 지력사무소"],["20260612", "[아크레이더스] 1주차 최종 1위 w. 지력사무소"],["20260617", "[메루] 오리지널 아바타 공개"],["20260619", "[아크레이더스] 2주차 최종 1위 w. 지력사무소"],["20260626", "[아크레이더스] 3주차 최종 1위 w. 지력사무소"],["20260629", "[린창서버] 최종 공동 1등 w. 지력사무소"],["20260717", "[지력사무소] 오락관 우승 w. 지피티 싱유 린코 이투"],["20260709", "[폴가이즈] 국가대항전 우승 w. 지력"],["20260806", "[삼국지] 적토마 모험히든 발견"],["20260809", "[후국지] 적토마 +10강 모험히든 발견"]
       ],
       games: [
         ["Welcome to kowloon", "⭐⭐⭐⭐", "2024.03.03", "분위기가 미친 게임 약간 공포게임의 .. 정석 ?"],
@@ -1142,14 +1958,14 @@
         ["Escape the Backroom", "⭐⭐⭐⭐", "2025.0.03", "무난한 재미 ?? 기억력이슈 기억안남 백룸이 너무 많음"],
         ["Dark water", "⭐⭐⭐", "2025.07.08", "ADHD 추천게임 수리공이 된 것 같은 기분이 들었어요! 누수 수리에 관심이 있다면 강추 ^^ 약간 킹받는 요소가 많아서 웃기고 재밌었음"],
         ["Murky Divers", "⭐⭐⭐", "2025.07.20", "새로운 탐사 지역을 발견하는 재미가 있었다! 이래서 해적이 있나??싶은 생각이 들었음"],
-        ["후즈앳더도어", "⭐⭐⭐⭐⭐", "2025.09.11", "짧고 굵어서 재밌었음 ......................................................(1초기절함)"],
+        ["후즈앳더도어", "⭐⭐⭐⭐⭐", "2025.09.11", "짧고 굵아서 재밌었음 ......................................................(1초기절함)"],
         ["패들패들패들", "⭐⭐⭐⭐⭐", "2025.09.28", "지력 ck때 처음 해봤는데 언젠가는 완주 해보고 싶음"],
         ["클로버핏 ★★★☆☆", "⭐⭐⭐", "-", "읍로버핏 최고점 25000원 죽어도 안함 소장님한테 마라탕값뜯김"],
         ["살육의 천사", "⭐⭐⭐⭐", "2025.10.12", "옛날 근본 쭈꾸르 갬성이 좋았음 ( 그리고 추격전때 솔직히 좀 쫄림 )"],
         ["팰월드 ", "⭐⭐⭐⭐⭐", "2025.09.25~", "게임 시스템 자체는 되게 좋았음 또 하고싶음 ( 사실 보스 잡는 것만 재밌었음 )"],
         ["사슴 시뮬레이터", "⭐⭐⭐⭐", "-", "무친 게임 1"],
         ["테라리아 ★★★★★ (전문가 난이도) ", "⭐⭐⭐⭐⭐", "-", "보스 잡는 게 재밌었음"],
-        ["아웃라스트3 ", "⭐⭐⭐⭐", "-", "퀄리티는 좋은데 게임의 매커니즘이 살짝 아쉬움 (루즈해지기 쉬움)"],
+        ["아웃라스트3 ", "⭐⭐⭐⭐", "-", "퀄리티는 좋은데 게임의 매커니즘이 살짝 아쉬움 (루즈해지기 쉽움)"],
         ["파라노이아 플레이스", "⭐⭐⭐⭐", "-", "게임 퀄은 좋았으나 퍼즐 요소가 살짝 복잡했다 (버그 이슈도 있음)"],
         ["School 666", "⭐⭐⭐⭐⭐", "-", "뻔한 이상현상인데도 참신해서 재밌었음"],
         ["백룸 컴퍼니", "⭐⭐⭐⭐", "-", "뻔한 이상현상인데도 참신해서 재밌었음"],
@@ -1225,7 +2041,7 @@
         ["💡 TMI", "21. 뉴비존 5수생 왜 안될까 했는데 신청 접수기간이 아닐때 계속 ( ... ) 신청을 했다고 한다"],
         ["💡 TMI", "22. 버니버스에 초대권을 받아서 들어간 당일날 점프맵 이벤트에서 1등을 해 초대권을 얻었다고 한다"],
         ["💡 TMI", "23. 방송 후기에 마크 일기도 종종 쓴다고 한다"],
-        ["💡 TMI", "24. 방송 초창기때는 직접 구독티콘과 시그니쳐 풍선을 만들어서 사용했다고 한다 현재는 메럿단 OGQ를 준비중이다"],
+        ["💡 TMI", "24. 방송 초창기때는 직접 구독티콘과 시그니쳐 풍선을 만들어서 사용했다 현재는 메럿단 OGQ를 준비중이다"],
         ["💡 TMI", "25. 방송 초창기때 방셀 문화가 신기해 시청자 모두에게 스방셀을 무료로 돌렸다고 한다.."],
         ["💡 TMI", "26. SOOP에서 나히아를 처음 봤는데 그 뒤로 혼자 7기까지 달렸다고 한다 데쿠의 찌질한 모먼트를 좋아한다고 한다"],
         ["💡 TMI", "27. 산나비 플레이中 송소령이 눈물을 흘리는 장면에서 같이 울었다"],
@@ -1251,11 +2067,11 @@
         ["💡 TMI", "46. 팬이 운영하는 유튜브 '메루띠띠' 팬채널이 있다"],
         ["💡 TMI", "47. '메루띠띠' 채널아트를 만들었다 !"],
         ["💡 TMI", "48. 발렌타인기념 히든미션 시청자 이벤트를 진행 !"],
-        ["💡 TMI", "49. 러브 라이브 OST - 스노하레 【COVER】 공개 Snow halation"],
+        ["💡 TMI", "49. 러브라이브 OST - 스노하레 【COVER】 공개 Snow halation"],
         ["💡 TMI", "50. 생일 역조공 이벤트 (Full moon 커버곡 공개) FULL MOON"],
         ["💡 TMI", "51. 연어장을 좋아한다 !"],
         ["💡 TMI", "52. 로볼록스 등산 대회에서 총 3번을 완주했다."],
-        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞𝐝𝐚𝐲]"],
+        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢ｔ𝐞𝐝𝐚𝐲]"],
         ["💡 TMI", "54. 4.12 ~ 18일 첫 다이아 서버 [야너다] 22시간 남기고 졸업!"],
         ["💡 TMI", "55. 4.17일 워든 신전 첫 트라이 ! 수선책도 하나 얻었다 !"],
         ["💡 TMI", "56. 파티 애니멀즈 버종대 출전 (메냥이펌피럼)"],
@@ -1271,7 +2087,7 @@
         ["💡 TMI", "66. 최애 성우가 반쪽하트 내밀어줌"],
         ["💡 TMI", "67. 가장 맛있게 먹은 햄버거 브랜드는 쉑쉑버거 + 밀크쉐이크 + 감자튀김 조합"],
         ["💡 TMI", "68. 맥도날드 맥플러리 + 롯데리아 토네이도 쿠키를 좋아한다"],
-        ["💡 TMI", "69. 메이드의 날 기념 3인 커버곡 공개  【뉴냥이 X 메루 X 뱌링】 愛♡スクリ～ム! (아이스크림) - AiScReam 🍦𝑪𝒐𝒗𝒆𝒓"],
+        ["💡 TMI", "69. 메이드의 날 기념 3인 커버곡 공개  【뉴냥이 X 메루 X 뱌링】 愛♡スクリ~ム! (아이스크림) - AiScReam 🍦𝑪𝒐𝒗𝒆𝒓"],
         ["💡 TMI", "70. OGQ 이모티콘 중에 웰시코기 시리즈 이모티콘을 가장 좋아한다."],
         ["💡 TMI", "71. 6.8 머리 , 눈 색상 변경 ( 흰뚝 카르텔 입성 )"],
         ["💡 TMI", "72. 6.12 일렉기타 연습 1일차! 목표 곡은 케이온 후와후와타임!! 젤 첨으로 연습했던 곡은 드라우닝이랑 HAPPY !"],
@@ -1357,6 +2173,34 @@
         img: (!isPlaceholder && pImgSrc) ? pImgSrc : (storeData.profile?.img || '') 
       };
 
+      const bannerEl = document.getElementById('home-banner-img-element');
+      const bannerSrc = bannerEl ? (bannerEl.getAttribute('src') || bannerEl.src || '') : '';
+      storeData.homeBanner = bannerSrc.includes('via.placeholder.com') ? '' : bannerSrc;
+
+      const sigBalloonImgEl = document.getElementById('sig-balloon-img-element');
+      const sigSrc = sigBalloonImgEl ? (sigBalloonImgEl.getAttribute('src') || sigBalloonImgEl.src || '') : '';
+      storeData.sigBalloonImg = sigSrc.includes('via.placeholder.com') ? '' : sigSrc;
+
+      const ogqCards = document.querySelectorAll('.ogq-item-card');
+      storeData.ogqList = [];
+      ogqCards.forEach(card => {
+        const imgEl = card.querySelector('.ogq-item-img');
+        const linkInput = card.querySelector('.ogq-link-input');
+        const imgSrc = imgEl ? (imgEl.getAttribute('src') || imgEl.src || '') : '';
+        const linkVal = linkInput ? linkInput.value.trim() : (card.getAttribute('data-link') || '#');
+        if (!imgSrc.includes('via.placeholder.com') || linkVal) {
+          storeData.ogqList.push([imgSrc, linkVal]);
+        }
+      });
+
+      const fanCharImgEl = document.getElementById('fan-char-img-element');
+      const fanCharImgSrc = fanCharImgEl ? (fanCharImgEl.getAttribute('src') || fanCharImgEl.src || '') : '';
+      const fanCharDescEl = document.getElementById('fan-char-desc');
+      storeData.fanChar = {
+        img: fanCharImgSrc.includes('via.placeholder.com') ? '' : fanCharImgSrc,
+        desc: fanCharDescEl ? fanCharDescEl.textContent.trim() : ''
+      };
+
       const gameBioEl = document.getElementById('game-bio');
       if (gameBioEl) {
         const rawHtml = gameBioEl.innerHTML.trim();
@@ -1370,11 +2214,6 @@
         storeData.gameBio = DEFAULT_GAME_BIO;
       }
 
-      const leftColCards = document.querySelectorAll('.main-col-left > .main-card-item');
-      const rightColCards = document.querySelectorAll('.main-col-right > .main-card-item');
-      storeData.cardOrderLeft = Array.from(leftColCards).map(el => el.id).filter(Boolean);
-      storeData.cardOrderRight = Array.from(rightColCards).map(el => el.id).filter(Boolean);
-
       const pBg = document.getElementById('picker-bg')?.value;
       const pAccent = document.getElementById('picker-accent')?.value;
       const pText = document.getElementById('picker-text')?.value;
@@ -1382,9 +2221,6 @@
       if (pBg && pAccent && pText && pTabText) {
         storeData.theme = { bg: pBg, accent: pAccent, text: pText, tabText: pTabText };
       }
-
-      storeData.videoUrl = document.getElementById('video-url-input')?.value.trim() || '';
-      storeData.videoType = document.getElementById('video-type-select')?.value || 'auto';
 
       const gridItems = document.querySelectorAll('.profile-info-grid .info-box-item');
       storeData.infoGrid = [];
@@ -1404,16 +2240,6 @@
         const urlInput = item.querySelector('.url-input');
         const url = urlInput ? urlInput.value.trim() : (item.querySelector('.link-anchor')?.getAttribute('data-href') || '');
         if (name || url) storeData.links.push([name, url]);
-      });
-
-      const schItems = document.querySelectorAll('#schedule-list .schedule-item');
-      storeData.schedules = [];
-      schItems.forEach(item => {
-        const day = item.querySelector('.sch-day-select')?.value || item.querySelector('.day-badge')?.textContent.trim() || '월요일';
-        const content = item.querySelector('.sch-content-edit')?.textContent.trim() || item.querySelector('.info-text')?.textContent.trim() || '';
-        const ampm = item.querySelector('.sch-ampm')?.value || 'PM';
-        const time = item.querySelector('.sch-time-val')?.value.trim() || '';
-        if (day || content) storeData.schedules.push([day, content, ampm, time]);
       });
 
       const annivItems = document.querySelectorAll('#anniv-list .anniv-item');
@@ -1458,6 +2284,8 @@
         const txt = item.querySelector('.tmi-content-text')?.textContent.trim() || '';
         if (tag || txt) storeData.tmi.push([tag, txt]);
       });
+
+      storeData.music = musicState;
     }
 
     function renderFromJSON(data) {
@@ -1480,28 +2308,19 @@
         if (pTabText) pTabText.value = data.theme.tabText;
       }
 
-      if (data.cardOrderLeft && Array.isArray(data.cardOrderLeft)) {
-        const leftCol = document.querySelector('.main-col-left');
-        if (leftCol) {
-          data.cardOrderLeft.forEach(id => {
-            const card = document.getElementById(id);
-            if (card && card.parentElement === leftCol) leftCol.appendChild(card);
-          });
-        }
-      }
-      if (data.cardOrderRight && Array.isArray(data.cardOrderRight)) {
-        const rightCol = document.querySelector('.main-col-right');
-        if (rightCol) {
-          data.cardOrderRight.forEach(id => {
-            const card = document.getElementById(id);
-            if (card && card.parentElement === rightCol) rightCol.appendChild(card);
-          });
-        }
+      if (data.music) {
+        musicState = { ...musicState, ...data.music };
+        updateMusicPlayerUI();
+        renderPlaylistEditor();
       }
 
       const nameEl = document.getElementById('profile-name');
       const bioEl = document.getElementById('profile-bio');
       const imgEl = document.getElementById('profile-img-element');
+      const bannerEl = document.getElementById('home-banner-img-element');
+      const sigBalloonEl = document.getElementById('sig-balloon-img-element');
+      const fanCharImgEl = document.getElementById('fan-char-img-element');
+      const fanCharDescEl = document.getElementById('fan-char-desc');
       const gameBioEl = document.getElementById('game-bio');
 
       if (nameEl && data.profile && data.profile.name) nameEl.textContent = data.profile.name;
@@ -1510,6 +2329,23 @@
         imgEl.src = data.profile.img;
         imgEl.setAttribute('src', data.profile.img);
       }
+      if (bannerEl && data.homeBanner) {
+        bannerEl.src = data.homeBanner;
+        bannerEl.setAttribute('src', data.homeBanner);
+      }
+      if (sigBalloonEl && data.sigBalloonImg) {
+        sigBalloonEl.src = data.sigBalloonImg;
+        sigBalloonEl.setAttribute('src', data.sigBalloonImg);
+      }
+      if (fanCharImgEl && data.fanChar && data.fanChar.img) {
+        fanCharImgEl.src = data.fanChar.img;
+        fanCharImgEl.setAttribute('src', data.fanChar.img);
+      }
+      if (fanCharDescEl && data.fanChar && data.fanChar.desc) {
+        fanCharDescEl.textContent = data.fanChar.desc;
+      }
+
+      renderOgqList(data.ogqList);
 
       if (gameBioEl) {
         const targetBio = (data && data.gameBio && getCleanPlainText(data.gameBio).length > 0) 
@@ -1519,16 +2355,6 @@
         if (data) data.gameBio = targetBio;
         storeData.gameBio = targetBio;
       }
-
-      if (data.videoUrl !== undefined) {
-        const vInput = document.getElementById('video-url-input');
-        if (vInput) vInput.value = data.videoUrl;
-      }
-      if (data.videoType !== undefined) {
-        const vType = document.getElementById('video-type-select');
-        if (vType) vType.value = data.videoType;
-      }
-      updateVideoPlayer(true);
 
       const grid = document.querySelector('.profile-info-grid');
       if (grid && data.infoGrid) {
@@ -1556,8 +2382,8 @@
                 <span class="info-box-label" contenteditable="false">${escapeHtml(label)}</span>
                 <div style="flex:1; text-align:right;"><span class="stream-days-badge" id="stream-days-display">${escapeHtml(val)}</span></div>
                 <button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button>
-                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
                 <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
               </div>`;
           }
@@ -1568,7 +2394,7 @@
               <span class="info-box-val" contenteditable="false">${escapeHtml(val)}</span>
               <button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button>
               <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-              <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+              <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
               <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
             </div>`;
         }).join('');
@@ -1595,43 +2421,6 @@
         `).join('');
       }
 
-      const schList = document.getElementById('schedule-list');
-      if (schList && data.schedules) {
-        schList.innerHTML = data.schedules.map(item => {
-          const contentStr = (item[1] || '');
-          const isOffDay = contentStr.includes('휴방') || item[3] === '휴방' || !item[3];
-          return `
-            <div class="item-row schedule-item">
-              <div class="schedule-view-box">
-                <span class="day-badge">${escapeHtml(item[0])}</span>
-                <span class="info-text">${escapeHtml(contentStr)}</span>
-                <span class="sub-text" style="display:${isOffDay ? 'none' : 'inline-block'};">${escapeHtml(item[2])} ${escapeHtml(item[3])}</span>
-              </div>
-              <div class="schedule-edit-box admin-only flex" style="flex-direction:row; align-items:center; width:100%; gap:6px;">
-                <select class="sch-day-select select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
-                  <option value="월요일" ${item[0]==='월요일'?'selected="selected"':''}>월요일</option>
-                  <option value="화요일" ${item[0]==='화요일'?'selected="selected"':''}>화요일</option>
-                  <option value="수요일" ${item[0]==='수요일'?'selected="selected"':''}>수요일</option>
-                  <option value="목요일" ${item[0]==='목요일'?'selected="selected"':''}>목요일</option>
-                  <option value="금요일" ${item[0]==='금요일'?'selected="selected"':''}>금요일</option>
-                  <option value="토요일" ${item[0]==='토요일'?'selected="selected"':''}>토요일</option>
-                  <option value="일요일" ${item[0]==='일요일'?'selected="selected"':''}>일요일</option>
-                </select>
-                <span contenteditable="false" class="sch-content-edit info-text" style="font-weight:700; flex:1;" oninput="applyScheduleInputToView(); triggerAutoSave();">${escapeHtml(contentStr)}</span>
-                <div class="sch-time-zone-edit" style="display:flex; align-items:center; gap:4px;">
-                  <select class="sch-ampm select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
-                    <option value="PM" ${item[2]==='PM'?'selected="selected"':''}>PM</option>
-                    <option value="AM" ${item[2]==='AM'?'selected="selected"':''}>AM</option>
-                  </select>
-                  <input type="text" class="time-text-input sch-time-val" value="${escapeAttr(item[3])}" oninput="applyScheduleInputToView(); this.setAttribute('value', this.value); triggerAutoSave();">
-                </div>
-                <button class="del-btn admin-only" onclick="this.closest('.schedule-item').remove(); triggerAutoSave();">×</button>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
       const annivList = document.getElementById('anniv-list');
       if (annivList && Array.isArray(data.anniversaries)) {
         annivList.innerHTML = data.anniversaries.map(item => {
@@ -1644,7 +2433,7 @@
               <span class="dday-badge">${calculateDDay(dStr)}</span>
               <div class="admin-only flex" style="gap:4px; align-items:center;">
                 <input type="date" class="date-input anniv-date-picker" value="${escapeAttr(formatYMD(dStr))}" onchange="updateAnnivDate(this)">
-                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button>
                 <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
                 <button class="del-btn admin-only" onclick="this.closest('.anniv-item').remove(); triggerAutoSave();">×</button>
               </div>
@@ -1675,6 +2464,112 @@
       }
     }
 
+    function renderOgqList(ogqArr) {
+      const listEl = document.getElementById('ogq-grid-list');
+      if (!listEl) return;
+      const list = (ogqArr && ogqArr.length > 0) ? ogqArr : (storeData.ogqList || []);
+      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
+
+      listEl.innerHTML = list.map((item, idx) => {
+        const imgSrc = item[0] || 'https://via.placeholder.com/80';
+        const linkUrl = item[1] || '#';
+        return `
+          <div class="ogq-item-card" data-link="${escapeAttr(linkUrl)}" onclick="handleOgqClick(this, '${escapeAttr(linkUrl)}')">
+            <img src="${escapeAttr(imgSrc)}" class="ogq-item-img" alt="OGQ">
+            <div class="ogq-edit-overlay admin-only">
+              <input type="file" id="ogq-file-${idx}" accept="image/*" style="display:none;" onchange="handleOgqImageUpload(event, ${idx})">
+              <label for="ogq-file-${idx}" class="move-btn" style="cursor:pointer; font-size:0.6rem; padding:2px 4px;">🖼️ 이미지</label>
+              <input type="text" class="url-input ogq-link-input" value="${escapeAttr(linkUrl)}" placeholder="이동 링크 URL" oninput="updateOgqFromDOM(); triggerAutoSave();" style="font-size:0.6rem; padding:2px 4px; height:20px;">
+              <button class="del-btn" onclick="event.stopPropagation(); removeOgqItem(${idx})" style="font-size:0.7rem; color:#fff;">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleOgqClick(cardEl, url) {
+      if (document.body.classList.contains('admin-mode')) return;
+      if (url && url !== '#' && url.trim() !== '') {
+        window.open(url, '_blank');
+      }
+    }
+
+    function addOgqItem() {
+      if (!storeData.ogqList) storeData.ogqList = [];
+      storeData.ogqList.push(["https://via.placeholder.com/80", "https://"]);
+      renderOgqList(storeData.ogqList);
+      triggerAutoSave();
+    }
+
+    function removeOgqItem(idx) {
+      if (storeData.ogqList && storeData.ogqList.length > idx) {
+        storeData.ogqList.splice(idx, 1);
+        renderOgqList(storeData.ogqList);
+        triggerAutoSave();
+      }
+    }
+
+    function handleOgqImageUpload(e, idx) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300; canvas.height = 300;
+            canvas.getContext('2d').drawImage(img, 0, 0, 300, 300);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+            if (!storeData.ogqList[idx]) storeData.ogqList[idx] = ["", ""];
+            storeData.ogqList[idx][0] = compressed;
+            renderOgqList(storeData.ogqList);
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateOgqFromDOM() {
+      const cards = document.querySelectorAll('.ogq-item-card');
+      const newList = [];
+      cards.forEach(card => {
+        const img = card.querySelector('.ogq-item-img');
+        const input = card.querySelector('.ogq-link-input');
+        const imgSrc = img ? (img.getAttribute('src') || img.src || '') : '';
+        const linkVal = input ? input.value.trim() : '#';
+        newList.push([imgSrc, linkVal]);
+      });
+      storeData.ogqList = newList;
+    }
+
+    function handleSigBalloonImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 400; canvas.height = 405; /* 2047:2076 비율 유지 최적화 */
+            canvas.getContext('2d').drawImage(img, 0, 0, 400, 405);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+            const sigBalloonEl = document.getElementById('sig-balloon-img-element');
+            if (sigBalloonEl) {
+              sigBalloonEl.src = compressed;
+              sigBalloonEl.setAttribute('src', compressed);
+            }
+            storeData.sigBalloonImg = compressed;
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
     function populateRestoredData(overrideData = null) {
       const targetData = overrideData || storeData;
       const achList = document.getElementById('achievement-list');
@@ -1687,7 +2582,7 @@
             <span class="anniv-date" contenteditable="false">${escapeHtml(item[0])}</span>
             <span class="info-text" contenteditable="false">${escapeHtml(item[1])}</span>
             <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
             <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>
           </div>
         `).join('');
@@ -1715,7 +2610,7 @@
             </div>
             <div>
               <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color); display:block; margin-bottom:4px;">📝 후기:</span>
-              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:#ffffff; padding:10px; border-radius:12px; border:1.5px solid #ffe0e6; white-space:pre-wrap;">${escapeHtml(item[3])}</div>
+              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border); white-space:pre-wrap;">${escapeHtml(item[3])}</div>
             </div>
             <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
               <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
@@ -1733,13 +2628,95 @@
               <span contenteditable="false" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706; box-shadow:none;">${escapeHtml(item[0])}</span>
               <div style="display:flex; gap:4px; align-items:center;">
                 <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
                 <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
               </div>
             </div>
             <div contenteditable="false" class="tmi-content-text" style="font-size:0.9rem; color:var(--text-color); line-height:1.6; width:100%; white-space:pre-wrap;">${escapeHtml(item[1])}</div>
           </div>
         `).join('');
+      }
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 832; canvas.height = 1216;
+            canvas.getContext('2d').drawImage(img, 0, 0, 832, 1216);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+            const profileImgEl = document.getElementById('profile-img-element');
+            if (profileImgEl) {
+              profileImgEl.src = compressed;
+              profileImgEl.setAttribute('src', compressed);
+            }
+
+            if (!storeData.profile) storeData.profile = {};
+            storeData.profile.img = compressed;
+            ImageStore.saveImage('profile_img', compressed);
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleBannerImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1216; canvas.height = 832;
+            canvas.getContext('2d').drawImage(img, 0, 0, 1216, 832);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+            const bannerEl = document.getElementById('home-banner-img-element');
+            if (bannerEl) {
+              bannerEl.src = compressed;
+              bannerEl.setAttribute('src', compressed);
+            }
+            storeData.homeBanner = compressed;
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleFanCharImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 150; canvas.height = 150;
+            canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
+            const compressed = canvas.toDataURL('image/jpeg', 0.8);
+
+            const fanCharImgEl = document.getElementById('fan-char-img-element');
+            if (fanCharImgEl) {
+              fanCharImgEl.src = compressed;
+              fanCharImgEl.setAttribute('src', compressed);
+            }
+            if (!storeData.fanChar) storeData.fanChar = {};
+            storeData.fanChar.img = compressed;
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
       }
     }
 
@@ -1800,6 +2777,8 @@
       if (statusText) statusText.textContent = "관리자 모드 (🟢 실시간 저장 완료)";
       setEditable(true);
       renderCalendar();
+      renderPlaylistEditor();
+      renderOgqList(storeData.ogqList);
     }
 
     function exitAdminMode() {
@@ -1810,24 +2789,24 @@
       if (statusText) statusText.textContent = "일반 모드";
       setEditable(false);
       applyLinkData();
-      applyScheduleInputToView();
       refreshAllDDay();
-      updateStreamDays(true);
       renderCalendar();
+      renderPlaylistEditor();
+      renderOgqList(storeData.ogqList);
     }
 
     function setEditable(val) {
-      const editableSelectors = ['#profile-name', '#profile-bio', '#game-bio', '.info-box-label', '.info-box-val', '.link-name-edit', '.sch-content-edit', '.anniv-title', '.mc-tag-text', '.achievement-item .anniv-date', '.achievement-item .info-text', '.game-title', '.game-date-text', '.game-review-text', '.tmi-tag', '.tmi-content-text', '.cal-event-time', '.cal-event-text'];
+      const editableSelectors = ['#profile-name', '#profile-bio', '#game-bio', '#fan-char-desc', '.info-box-label', '.info-box-val', '.link-name-edit', '.anniv-title', '.mc-tag-text', '.achievement-item .anniv-date', '.achievement-item .info-text', '.game-title', '.game-date-text', '.game-review-text', '.tmi-tag', '.tmi-content-text', '.cal-event-time', '.cal-event-text'];
       document.querySelectorAll(editableSelectors.join(', ')).forEach(el => { el.setAttribute('contenteditable', val ? "true" : "false"); });
       document.querySelectorAll('.game-rating-select').forEach(sel => { sel.disabled = !val; });
     }
 
-    function switchTab(event, tabId) {
+    function switchTab(btnEl, tabId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-      if (event && event.currentTarget) {
-        event.currentTarget.classList.add('active');
+      if (btnEl && btnEl.classList) {
+        btnEl.classList.add('active');
       } else {
         const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick')?.includes(`'${tabId}'`));
         if (targetBtn) targetBtn.classList.add('active');
@@ -1835,10 +2814,16 @@
 
       const targetTab = document.getElementById('tab-' + tabId);
       if (targetTab) targetTab.classList.add('active');
-      if (tabId === 'monthly') renderCalendar();
+        
+      if (tabId === 'monthly') {
+        setTimeout(renderCalendar, 20);
+      }
+      if (tabId === 'home') {
+        updateMusicPlayerUI();
+      }
     }
 
-    function openEventDetailModal(dateKey, time, text) {
+    function openDayEventsModal(dateKey) {
       const dateEl = document.getElementById('evt-detail-date');
       const timeEl = document.getElementById('evt-detail-time');
       const contentEl = document.getElementById('evt-detail-content');
@@ -1846,13 +2831,41 @@
       if (dateKey) {
         const parts = formatYMD(dateKey).split('-');
         dateEl.textContent = parts.length === 3 ? `📅 ${parts[0]}년 ${parts[1]}월 ${parts[2]}일 일정` : `📅 ${dateKey} 일정`;
-      } else { dateEl.textContent = `📅 일정 상세보기`; }
+      } else { 
+        dateEl.textContent = `📅 일정 상세보기`; 
+      }
 
-      if (time && time.trim()) {
-        timeEl.textContent = `⏰ 시간: ${time.trim()}`; timeEl.style.display = 'block';
-      } else { timeEl.textContent = ''; timeEl.style.display = 'none'; }
+      if (timeEl) timeEl.style.display = 'none';
 
-      contentEl.textContent = text || '내용이 없습니다.';
+      const evts = calendarEvents[dateKey] || [];
+      if (evts.length === 0) {
+        contentEl.innerHTML = '<div style="text-align:center; color:#8c6b73; padding:16px 0; font-weight:700;">등록된 일정이 없습니다.</div>';
+      } else {
+        contentEl.innerHTML = evts.map((evt, idx) => `
+          <style>
+            .cal-event-detail-item {
+              background: var(--card-bg);
+              border: 1.5px solid var(--item-border);
+              border-radius: 12px;
+              padding: 10px 12px;
+              margin-bottom: 8px;
+              box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+              text-align: left;
+            }
+          </style>
+          <div class="cal-event-detail-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.75rem; font-weight:800; color:var(--accent-color); background:var(--item-bg); padding:2px 8px; border-radius:6px;">
+                ${evt.time && evt.time.trim() ? '⏰ ' + escapeHtml(evt.time.trim()) : '📌 하루 종일'}
+              </span>
+              <span style="font-size:0.75rem; color:var(--tab-text-color); font-weight:800;">#${idx + 1}</span>
+            </div>
+            <div style="font-size:0.92rem; font-weight:700; color:var(--text-color); white-space:pre-wrap; word-break:break-all; line-height:1.4;">
+              ${escapeHtml(evt.text || '내용 없음')}
+            </div>
+          </div>
+        `).join('');
+      }
       openModal('event-detail-modal');
     }
 
@@ -1937,39 +2950,6 @@
       renderPaginatedList('tmi-list', 'pagination-tmi', 'tmi');
     }
 
-    function applyScheduleInputToView() {
-      document.querySelectorAll('.schedule-item').forEach(item => {
-        const daySelect = item.querySelector('.sch-day-select');
-        const contentEdit = item.querySelector('.sch-content-edit');
-        const ampmSelect = item.querySelector('.sch-ampm');
-        const timeValInput = item.querySelector('.sch-time-val');
-        const viewDay = item.querySelector('.day-badge');
-        const viewContent = item.querySelector('.info-text');
-        const viewTime = item.querySelector('.sub-text');
-
-        if(daySelect && contentEdit && ampmSelect && timeValInput && viewDay && viewContent && viewTime) {
-          viewDay.textContent = daySelect.value;
-          const contentStr = contentEdit.textContent.trim();
-          viewContent.textContent = contentStr;
-          const cleanTime = timeValInput.value.trim();
-          if (contentStr.includes('휴방') || cleanTime === '휴방' || !cleanTime) {
-            viewTime.style.display = 'none';
-          } else {
-            viewTime.style.display = 'inline-block';
-            viewTime.textContent = [ampmSelect.value, cleanTime].filter(Boolean).join(' ');
-          }
-        }
-      });
-    }
-
-    function handleLinkAnchorClick(el) {
-      if (!document.body.classList.contains('admin-mode')) {
-        let targetUrl = (el.getAttribute('data-href') || '').trim();
-        if (targetUrl && !targetUrl.match(/^https?:\/\//i)) targetUrl = 'https://' + targetUrl;
-        if (targetUrl && targetUrl !== 'https://#') window.open(targetUrl, '_blank');
-      }
-    }
-
     function adjustPaginationAfterMove(parent, movedRow) {
       const listId = parent ? parent.id : '';
       let pageKey = '';
@@ -1989,7 +2969,7 @@
     }
 
     function moveRowUp(btn) {
-      const row = btn.closest('.info-box-item, .link-item, .schedule-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
+      const row = btn.closest('.info-box-item, .link-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
       if (row && row.previousElementSibling) {
         const parent = row.parentElement;
         parent.insertBefore(row, row.previousElementSibling);
@@ -2000,28 +2980,12 @@
     }
 
     function moveRowDown(btn) {
-      const row = btn.closest('.info-box-item, .link-item, .schedule-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
+      const row = btn.closest('.info-box-item, .link-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
       if (row && row.nextElementSibling) {
         const parent = row.parentElement;
         parent.insertBefore(row.nextElementSibling, row);
         adjustPaginationAfterMove(parent, row);
         updateAllPaginations();
-        triggerAutoSave();
-      }
-    }
-
-    function moveCardUp(btn) {
-      const card = btn.closest('.main-card-item');
-      if (card && card.previousElementSibling && card.previousElementSibling.classList.contains('main-card-item')) {
-        card.parentElement.insertBefore(card, card.previousElementSibling);
-        triggerAutoSave();
-      }
-    }
-
-    function moveCardDown(btn) {
-      const card = btn.closest('.main-card-item');
-      if (card && card.nextElementSibling && card.nextElementSibling.classList.contains('main-card-item')) {
-        card.parentElement.insertBefore(card, card.nextElementSibling);
         triggerAutoSave();
       }
     }
@@ -2039,7 +3003,8 @@
       clearBtn.style.display = 'inline-block'; dropdown.innerHTML = '';
 
       const targets = [
-        { id: 'tab-main', tabName: 'main', badge: '🎀 메인 프로필' },
+        { id: 'tab-home', tabName: 'home', badge: '🏠 홈' },
+        { id: 'tab-profile', tabName: 'profile', badge: '🎀 프로필' },
         { id: 'tab-achievements', tabName: 'achievements', badge: '🏆 방송 업적' },
         { id: 'tab-games', tabName: 'games', badge: '🎮 플레이 게임' },
         { id: 'tab-tmi', tabName: 'tmi', badge: '💬 TMI & 여담' }
@@ -2049,7 +3014,7 @@
       targets.forEach(target => {
         const tabEl = document.getElementById(target.id);
         if (!tabEl) return;
-        const items = tabEl.querySelectorAll('.info-box-item, .item-row, .game-card-item');
+        const items = tabEl.querySelectorAll('.info-box-item, .item-row, .game-card-item, .fan-character-box');
         items.forEach((item, idx) => {
           const clone = item.cloneNode(true);
           clone.querySelectorAll('.admin-only, button, select, input').forEach(el => el.remove());
@@ -2064,6 +3029,28 @@
         });
       });
 
+      if (calendarEvents && typeof calendarEvents === 'object') {
+        for (const [dateKey, evts] of Object.entries(calendarEvents)) {
+          if (Array.isArray(evts)) {
+            evts.forEach(evt => {
+              const timeText = evt.time ? evt.time.trim() : '';
+              const descText = evt.text ? evt.text.trim() : '';
+              const fullStr = `${dateKey} ${timeText} ${descText}`;
+              if (fullStr.toLowerCase().includes(keyword)) {
+                let clean = `[${dateKey}] ${timeText ? timeText + ' ' : ''}${descText}`.trim();
+                if (clean.length > 45) clean = clean.substring(0, 45) + '...';
+                results.push({
+                  text: clean,
+                  tabName: 'monthly',
+                  badge: '📅 월간 일정',
+                  dateKey: dateKey
+                });
+              }
+            });
+          }
+        }
+      }
+
       if (results.length === 0) {
         dropdown.innerHTML = '<div style="padding:12px; font-size:0.85rem; font-weight:700; text-align:center;">🔍 검색 결과가 없습니다.</div>';
       } else {
@@ -2071,11 +3058,40 @@
           const div = document.createElement('div');
           div.className = 'search-result-item';
           div.innerHTML = `<span class="search-result-text">${escapeHtml(res.text)}</span><span class="search-result-badge">${res.badge}</span>`;
-          div.onclick = function() { jumpToSearchResult(res.tabName, res.elementId); };
+          div.onclick = function() { 
+            if (res.tabName === 'monthly') {
+              jumpToCalendarDate(res.dateKey);
+            } else {
+              jumpToSearchResult(res.tabName, res.elementId); 
+            }
+          };
           dropdown.appendChild(div);
         });
       }
       dropdown.style.display = 'flex';
+    }
+
+    function jumpToCalendarDate(dateKey) {
+      const dropdown = document.getElementById('search-results-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+
+      const parts = dateKey.split('-');
+      if (parts.length === 3) {
+        currentYear = parseInt(parts[0], 10);
+        currentMonth = parseInt(parts[1], 10) - 1;
+      }
+      switchTab(null, 'monthly');
+      renderCalendar();
+
+      setTimeout(() => {
+        const targetCell = document.getElementById(`cal-cell-${dateKey}`);
+        if (targetCell) {
+          targetCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetCell.classList.add('search-highlight');
+          setTimeout(() => targetCell.classList.remove('search-highlight'), 2400);
+        }
+        openDayEventsModal(dateKey);
+      }, 150);
     }
 
     function jumpToSearchResult(tabName, elementId) {
@@ -2137,7 +3153,7 @@
       inputEl.setAttribute('value', selectedDate);
       parent.setAttribute('data-date', selectedDate);
       const parts = formatYMD(selectedDate).split('-');
-      if (parts.length === 3) parent.querySelector('.anniv-date').textContent = `${parts[1].padStart(2, '0')}.${parts[2].padStart(2, '0')}`;
+      if (parts.length === 3) parent.querySelector('.anniv-date').textContent = `${String(parts[1]).padStart(2, '0')}.${String(parts[2]).padStart(2, '0')}`;
       parent.querySelector('.dday-badge').textContent = calculateDDay(selectedDate);
       triggerAutoSave();
     }
@@ -2171,67 +3187,6 @@
       if (!skipAutoSave) triggerAutoSave();
     }
 
-    function parseVideoEmbedUrl(rawUrl) {
-      if (!rawUrl) return '';
-      let url = rawUrl.trim();
-
-      if (url.includes('<iframe') && url.includes('src=')) {
-        const match = url.match(/src=["']([^"']+)["']/i);
-        if (match && match[1]) url = match[1];
-      }
-
-      let videoId = '';
-      if (url.includes('youtu.be/')) {
-        videoId = url.split('youtu.be/')[1].split('?')[0].split('&')[0].split('#')[0];
-      } else if (url.includes('youtube.com/shorts/')) {
-        videoId = url.split('youtube.com/shorts/')[1].split('?')[0].split('&')[0].split('#')[0];
-      } else if (url.includes('youtube.com/watch')) {
-        try {
-          const parsed = new URL(url);
-          videoId = parsed.searchParams.get('v') || '';
-        } catch(e) {
-          const m = url.match(/[?&]v=([^&]+)/);
-          if (m) videoId = m[1];
-        }
-      } else if (url.includes('youtube.com/embed/')) {
-        return url;
-      }
-
-      if (videoId) {
-        return `https://www.youtube.com/embed/${videoId}`;
-      }
-
-      return url;
-    }
-
-    function updateVideoPlayer(skipAutoSave = false) {
-      const inputEl = document.getElementById('video-url-input');
-      const selectEl = document.getElementById('video-type-select');
-      const iframeEl = document.getElementById('main-video-iframe');
-      const videoEl = document.getElementById('main-video-element');
-      if (!inputEl || !iframeEl || !videoEl) return;
-
-      const rawUrl = inputEl.value.trim();
-      const videoType = selectEl ? selectEl.value : 'auto';
-      const embedUrl = parseVideoEmbedUrl(rawUrl);
-
-      inputEl.setAttribute('value', rawUrl);
-
-      if (videoType === 'mp4' || (videoType === 'auto' && (rawUrl.endsWith('.mp4') || rawUrl.endsWith('.webm') || rawUrl.endsWith('.ogg')))) {
-        iframeEl.style.display = 'none';
-        iframeEl.src = '';
-        videoEl.style.display = 'block';
-        if (videoEl.src !== rawUrl) videoEl.src = rawUrl;
-      } else {
-        videoEl.style.display = 'none';
-        videoEl.src = '';
-        iframeEl.style.display = 'block';
-        if (iframeEl.src !== embedUrl) iframeEl.src = embedUrl;
-      }
-
-      if (!skipAutoSave) triggerAutoSave();
-    }
-
     function renderCalendar() {
       const calTitle = document.getElementById('calendar-title');
       if (calTitle) calTitle.textContent = `${currentYear}년 ${currentMonth + 1}월`;
@@ -2244,21 +3199,47 @@
       }
       const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
       for (let date = 1; date <= lastDate; date++) {
-        const cell = document.createElement('div'); cell.className = 'cal-cell';
+        const cell = document.createElement('div'); 
+        cell.className = 'cal-cell';
         const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
+        cell.id = `cal-cell-${dateKey}`;
+            
+        cell.onclick = function(e) {
+          if (!document.body.classList.contains('admin-mode') && !e.target.closest('.cal-add-evt-btn') && !e.target.closest('.cal-event-del')) {
+            openDayEventsModal(dateKey);
+          }
+        };
+
         const cellHeader = document.createElement('div'); cellHeader.className = 'cal-cell-header';
+            
+        const numWrap = document.createElement('div');
+        numWrap.style.cssText = 'display:flex; align-items:center; gap:4px;';
         const num = document.createElement('span'); num.className = 'cal-num'; num.textContent = date;
-        cellHeader.appendChild(num);
+        numWrap.appendChild(num);
+
+        let events = calendarEvents[dateKey] || [];
+        if (events.length >= 3) {
+          const countBadge = document.createElement('span');
+          countBadge.style.cssText = 'font-size:0.58rem; font-weight:800; color:var(--accent-color); background:var(--item-bg); padding:1px 4px; border-radius:6px; line-height:1; border:1px solid var(--item-border);';
+          countBadge.textContent = `${events.length}`;
+          numWrap.appendChild(countBadge);
+        }
+        cellHeader.appendChild(numWrap);
+
         if (isAdmin) {
           const addEvtBtn = document.createElement('button'); addEvtBtn.className = 'cal-add-evt-btn'; addEvtBtn.textContent = '+';
-          addEvtBtn.onclick = function() { addCalendarEventItem(dateKey, '', ''); };
+          addEvtBtn.onclick = function(e) { 
+            e.stopPropagation(); 
+            addCalendarEventItem(dateKey, '', ''); 
+          };
           cellHeader.appendChild(addEvtBtn);
         }
         cell.appendChild(cellHeader);
+
         const evtList = document.createElement('div'); evtList.className = 'cal-event-list'; evtList.id = `cal-evt-list-${dateKey}`;
-        let events = calendarEvents[dateKey] || [];
         events.forEach(evtObj => renderEventItem(evtList, dateKey, evtObj.time || '', evtObj.text || '', isAdmin));
-        cell.appendChild(evtList); calBody.appendChild(cell);
+        cell.appendChild(evtList); 
+        calBody.appendChild(cell);
       }
     }
 
@@ -2268,7 +3249,8 @@
       item.style.cursor = 'pointer';
       item.onclick = function(e) {
         if (!document.body.classList.contains('admin-mode')) {
-          openEventDetailModal(dateKey, time, text);
+          e.stopPropagation();
+          openDayEventsModal(dateKey);
         }
       };
 
@@ -2300,7 +3282,8 @@
       if (eventText === null) return;
       if (!calendarEvents[dateKey]) calendarEvents[dateKey] = [];
       calendarEvents[dateKey].push({ time: time || '', text: eventText.trim() || '새 일정' });
-      renderCalendar(); saveCalendarEventsFromDOM(); triggerAutoSave();
+      renderCalendar(); 
+      triggerAutoSave();
     }
 
     function saveCalendarEventsFromDOM() {
@@ -2323,10 +3306,12 @@
     }
 
     function moveMonth(delta) {
-      saveCalendarEventsFromDOM(); currentMonth += delta;
+      saveCalendarEventsFromDOM(); 
+      currentMonth += delta;
       if (currentMonth < 0) { currentMonth = 11; currentYear--; }
       else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
       renderCalendar();
+      triggerAutoSave();
     }
 
     function manualSavePage() { savePage(false); }
@@ -2375,7 +3360,7 @@
     function addProfileInfoItem() {
       const grid = document.querySelector('.profile-info-grid'); if (!grid) return;
       const div = document.createElement('div'); div.className = 'info-box-item';
-      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
+      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
       grid.appendChild(div); setEditable(true); triggerAutoSave();
     }
 
@@ -2390,13 +3375,13 @@
       const list = document.getElementById('achievement-list');
       if (!list) return;
       const today = new Date();
-      const todayYm = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+      const todayYmd8 = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
       const div = document.createElement('div');
       div.className = 'item-row achievement-item';
       div.innerHTML = `
-        <span class="anniv-date" contenteditable="true">${todayYm}</span>
+        <span class="anniv-date" contenteditable="true">${todayYmd8}</span>
         <span class="info-text" contenteditable="true">달성했던 방송 업적 및 기록 기재</span>
-        <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+        <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button>
         <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
         <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>`;
       list.appendChild(div);
@@ -2437,7 +3422,7 @@
           <span contenteditable="true" class="game-date-text" style="font-size:0.85rem; font-weight:700;">${todayFormatted}</span>
         </div>
         <div>
-          <div contenteditable="true" class="game-review-text" style="font-size:0.88rem; background:#ffffff; padding:10px; border-radius:12px; border:1.5px solid #ffe0e6;">게임 후기를 작성하세요.</div>
+          <div contenteditable="true" class="game-review-text" style="font-size:0.88rem; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border);">게임 후기를 작성하세요.</div>
         </div>
         <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
           <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
@@ -2466,8 +3451,8 @@
         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
           <span contenteditable="true" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706;">💡 TMI</span>
           <div style="display:flex; gap:4px; align-items:center;">
-            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
             <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
           </div>
         </div>
@@ -2497,50 +3482,13 @@
           <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
             <span contenteditable="true" class="link-name-edit" style="font-weight:700; flex:1;" oninput="applyLinkData(); triggerAutoSave();">새로운 링크</span>
             <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
             <button class="del-btn admin-only" onclick="this.closest('.link-item').remove(); triggerAutoSave();">삭제 ×</button>
           </div>
           <input type="text" class="url-input" value="https://" placeholder="https://" oninput="applyLinkData(); this.setAttribute('value', this.value); triggerAutoSave();">
         </div>`;
       list.appendChild(div);
       applyLinkData();
-      setEditable(true);
-      triggerAutoSave();
-    }
-
-    function addSchedule() {
-      const list = document.getElementById('schedule-list');
-      if (!list) return;
-      const div = document.createElement('div');
-      div.className = 'item-row schedule-item';
-      div.innerHTML = `
-        <div class="schedule-view-box">
-          <span class="day-badge">월요일</span>
-          <span class="info-text">정규 라이브 방송</span>
-          <span class="sub-text" style="display:inline-block;">PM 20:00</span>
-        </div>
-        <div class="schedule-edit-box admin-only flex" style="flex-direction:row; align-items:center; width:100%; gap:6px;">
-          <select class="sch-day-select select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
-            <option value="월요일" selected="selected">월요일</option>
-            <option value="화요일">화요일</option>
-            <option value="수요일">수요일</option>
-            <option value="목요일">목요일</option>
-            <option value="금요일">금요일</option>
-            <option value="토요일">토요일</option>
-            <option value="일요일">일요일</option>
-          </select>
-          <span contenteditable="true" class="sch-content-edit info-text" style="font-weight:700; flex:1;" oninput="applyScheduleInputToView(); triggerAutoSave();">정규 라이브 방송</span>
-          <div class="sch-time-zone-edit" style="display:flex; align-items:center; gap:4px;">
-            <select class="sch-ampm select-input" onchange="applyScheduleInputToView(); triggerAutoSave();">
-              <option value="PM" selected="selected">PM</option>
-              <option value="AM">AM</option>
-            </select>
-            <input type="text" class="time-text-input sch-time-val" value="20:00" placeholder="20:00" oninput="applyScheduleInputToView(); this.setAttribute('value', this.value); triggerAutoSave();">
-          </div>
-          <button class="del-btn admin-only" onclick="this.closest('.schedule-item').remove(); triggerAutoSave();">×</button>
-        </div>`;
-      list.appendChild(div);
-      applyScheduleInputToView();
       setEditable(true);
       triggerAutoSave();
     }
@@ -2560,7 +3508,7 @@
         <div class="admin-only flex" style="gap:4px; align-items:center;">
           <input type="date" class="date-input anniv-date-picker" value="${todayYmd}" onchange="updateAnnivDate(this);">
           <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-          <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+          <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
           <button class="del-btn admin-only" onclick="this.closest('.anniv-item').remove(); triggerAutoSave();">×</button>
         </div>`;
       list.appendChild(div);
@@ -2570,7 +3518,7 @@
     }
 
     function openThemeModal() { 
-      const theme = storeData.theme || { bg: '#fff0f5', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
+      const theme = storeData.theme || { bg: '#fff8fb', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
       tempOriginalTheme = { ...theme };
 
       const pBg = document.getElementById('picker-bg');
@@ -2578,7 +3526,7 @@
       const pText = document.getElementById('picker-text');
       const pTabText = document.getElementById('picker-tab-text');
 
-      if (pBg) pBg.value = theme.bg || '#fff0f5';
+      if (pBg) pBg.value = theme.bg || '#fff8fb';
       if (pAccent) pAccent.value = theme.accent || '#ff4d73';
       if (pText) pText.value = theme.text || '#5c3a42';
       if (pTabText) pTabText.value = theme.tabText || '#ff758c';
@@ -2619,38 +3567,8 @@
       savePage(false); 
     }
 
-    function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 150; canvas.height = 150;
-            canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
-            const compressed = canvas.toDataURL('image/jpeg', 0.75);
-
-            const profileImgEl = document.getElementById('profile-img-element');
-            if (profileImgEl) {
-              profileImgEl.src = compressed;
-              profileImgEl.setAttribute('src', compressed);
-            }
-
-            if (!storeData.profile) storeData.profile = {};
-            storeData.profile.img = compressed;
-            ImageStore.saveImage('profile_img', compressed);
-            triggerAutoSave();
-          };
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
     function openBulkPasteModal(target) {
       currentBulkPasteTarget = target;
-      document.getElementById('bulk-paste-title').textContent = '📋 여러 줄 한 번에 붙여넣기';
       document.getElementById('bulk-paste-text').value = '';
       openModal('bulk-paste-modal');
     }
@@ -2662,10 +3580,10 @@
       const lines = rawText.split('\n');
       const today = new Date();
       const todayFormatted = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-      const todayYm = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+      const todayYmd8 = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
       if (currentBulkPasteTarget === 'achievements') {
-        lines.forEach(line => { if (line.trim()) storeData.achievements.push([todayYm, line.trim()]); });
+        lines.forEach(line => { if (line.trim()) storeData.achievements.push([todayYmd8, line.trim()]); });
       } else if (currentBulkPasteTarget === 'games') {
         lines.forEach(line => { if (line.trim()) storeData.games.push([line.trim(), "⭐⭐⭐⭐⭐⭐", todayFormatted, "후기 기재"]); });
       } else if (currentBulkPasteTarget === 'tmi') {
@@ -2708,7 +3626,9 @@
     }
 
     function initApp() {
+      initDarkMode();
       loadFromLocalStorage();
+      renderCalendar();
       if (isFirebaseActive && db) {
         db.ref('live_profile_json_v3').on('value', snapshot => {
           const activeEl = document.activeElement;
