@@ -647,214 +647,40 @@
     .mc-tag-item { display: inline-flex; align-items: center; gap: 6px; background: var(--item-bg); border: 1.5px solid var(--item-border); padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); max-width: 100%; }
     .mc-tag-text { font-weight: 800; color: var(--accent-color); font-size: 0.85rem; word-break: break-all; }
 
-    /* ==================== 💽 음악 재생 플레이어 스타일 (음량 조절 추가) ==================== */
-    .home-music-card {
+    /* ==================== 📅 주간 일정 카드 스타일 복원 ==================== */
+    .weekly-schedule-card {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      align-items: center;
-      text-align: center;
-    }
-    .music-player-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      width: 100%;
-    }
-    .cd-disc-wrapper {
-      position: relative;
-      width: 290px;
-      height: 290px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      filter: drop-shadow(0 14px 28px rgba(0,0,0,0.18));
-    }
-    .cd-disc {
-      width: 290px;
-      height: 290px;
-      border-radius: 50%;
-      background-color: #222;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      border: 6px solid #e8e8e8;
-      box-shadow: inset 0 0 24px rgba(255,255,255,0.3);
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      image-rendering: -webkit-optimize-contrast;
-    }
-    .cd-disc.spinning {
-      animation: cdSpin 4s linear infinite;
-    }
-    @keyframes cdSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .cd-center-hole {
-      width: 24px;
-      height: 24px;
-      background: var(--card-bg);
-      border-radius: 50%;
-      border: 3px solid #d0d0d0;
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
-      z-index: 2;
-    }
-    .cd-disc::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      border-radius: 50%;
-      border: 1px dashed rgba(255,255,255,0.25);
-      pointer-events: none;
-    }
-    .song-details {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .player-btn-group {
-      display: flex;
       gap: 10px;
-      align-items: center;
-      justify-content: center;
     }
-    .player-action-btn {
+    .weekly-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
       background: var(--item-bg);
-      border: 2px solid var(--item-border);
-      color: var(--accent-color);
+      border-radius: 16px;
+      border: 1.5px solid var(--item-border);
+      gap: 10px;
+    }
+    .weekly-day-badge {
       font-weight: 900;
-      font-size: 0.95rem;
-      padding: 8px 16px;
-      border-radius: 16px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 0.82rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: #ffecb3;
+      color: #d97706;
+      white-space: nowrap;
+      flex: 0 0 auto;
     }
-    .player-action-btn:hover { transform: scale(1.08); background: var(--card-border); }
-    .player-main-play {
-      background: var(--accent-color);
-      color: #ffffff;
-      border-color: var(--accent-color);
-      padding: 8px 24px;
+    .weekly-text {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-color);
+      flex: 1;
+      word-break: break-all;
+      outline: none;
     }
-    .player-main-play:hover { background: #ff335e; }
-
-    .volume-slider-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--item-bg);
-      border: 1.5px solid var(--item-border);
-      padding: 6px 14px;
-      border-radius: 16px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: var(--accent-color);
-    }
-    .volume-slider-box input[type="range"] {
-      accent-color: var(--accent-color);
-      cursor: pointer;
-      width: 100px;
-    }
-
-    /* 재생목록 접기/펼치기 토글 버튼 */
-    .playlist-toggle-btn {
-      background: var(--item-bg);
-      border: 1.5px solid var(--item-border);
-      color: var(--accent-color);
-      font-size: 0.8rem;
-      font-weight: 800;
-      padding: 6px 14px;
-      border-radius: 14px;
-      cursor: pointer;
-      margin-top: 4px;
-    }
-    .playlist-accordion-content {
-      width: 100%;
-      max-height: 220px;
-      overflow-y: auto;
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 2px dashed var(--card-border);
-    }
-    .playlist-accordion-content.open {
-      display: flex;
-    }
-
-    /* ==================== 📅 월간 달력 레이아웃 & 스크롤 최적화 ==================== */
-    .calendar-container { 
-      width: 100%; 
-      overflow-x: hidden; 
-      transform: translateZ(0);
-      contain: layout style;
-    }
-    .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px; }
-    .calendar-header h2 { font-size: 1.5rem; color: var(--accent-color); font-weight: 900; letter-spacing: -0.5px; }
-    .cal-nav-btn { background: var(--item-bg); border: 2px solid var(--card-border); padding: 8px 18px; border-radius: 16px; cursor: pointer; font-weight: 800; font-size: 1rem; color: var(--accent-color); transition: all 0.2s ease; touch-action: manipulation; user-select: none; }
-    .cal-nav-btn:hover { background: var(--card-border); }
-
-    .calendar-grid { 
-      display: grid; 
-      grid-template-columns: repeat(7, minmax(0, 1fr)); 
-      gap: 10px; 
-      width: 100%; 
-    }
-    .cal-day-name { font-size: 0.98rem; font-weight: 900; color: var(--accent-color); padding-bottom: 8px; text-align: center; }
-    .cal-cell { 
-      background: var(--item-bg); 
-      border: 2px solid var(--item-border); 
-      border-radius: 20px; 
-      height: 190px;
-      padding: 10px; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 6px; 
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); 
-      overflow-y: auto; 
-      overscroll-behavior: auto; 
-      touch-action: pan-y; 
-      min-width: 0; 
-      cursor: pointer; 
-      -webkit-overflow-scrolling: touch; 
-    }
-    .cal-cell.empty-cell { background: transparent !important; border: none !important; box-shadow: none !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; pointer-events: none; cursor: default; }
-    .cal-cell::-webkit-scrollbar { width: 3px; }
-    .cal-cell::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
-    .cal-cell-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 2px; }
-    .cal-num { font-weight: 900; font-size: 1rem; color: var(--text-color); }
-    .cal-add-evt-btn { background: var(--card-border); border: none; color: var(--accent-color); width: 22px; height: 22px; border-radius: 50%; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; }
-
-    .cal-event-list { display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 0; }
-    .cal-event-item { display: flex; flex-direction: column; gap: 2px; background: var(--card-bg); color: var(--text-color); padding: 6px 8px; border-radius: 12px; border: 1.5px solid var(--item-border); width: 100%; position: relative; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); cursor: pointer; transition: transform 0.15s; min-width: 0; }
-    .cal-event-item:hover { transform: scale(1.01); opacity: 0.9; }
-    .cal-event-top { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 2px; min-width: 0; }
-    .cal-event-time { 
-      font-size: 0.7rem; 
-      font-weight: 800; 
-      color: var(--accent-color); 
-      outline: none; 
-      background: var(--item-bg); 
-      padding: 1px 6px; 
-      border-radius: 6px; 
-      white-space: nowrap !important; 
-      word-break: normal !important; 
-      display: inline-block; 
-      max-width: 100%; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-    }
-    .cal-event-time:empty:not([contenteditable="true"]) { display: none; }
-    .cal-event-text { font-size: 0.82rem; font-weight: 700; outline: none; word-break: break-all; word-wrap: break-word; white-space: pre-wrap; width: 100%; line-height: 1.3; min-width: 0; }
-    .cal-event-del { border: none; background: transparent; color: #ffb6c1; font-size: 0.95rem; cursor: pointer; padding: 2px 4px; touch-action: manipulation; user-select: none; }
 
     /* ==================== 📱 모바일 최적화 미디어 쿼리 ==================== */
     @media (max-width: 768px) {
@@ -1025,7 +851,7 @@
         </div>
       </div>
 
-      <!-- 바로가기 & 음악 재생실 개별 독립 2단 그리드 -->
+      <!-- 바로가기 & 주간일정 개별 독립 2단 그리드 -->
       <div class="grid-2">
         <!-- 🔗 바로가기 카드 (독립된 칸) -->
         <div class="card">
@@ -1036,54 +862,13 @@
           <div class="list-wrapper" id="link-list"></div>
         </div>
 
-        <!-- 🎵 메루의 음악실 카드 (독립된 칸) -->
-        <div class="card home-music-card">
-          <div class="section-header" style="width: 100%; margin-bottom: 4px;">
-            <div class="section-title">💿 메루의 음악실</div>
+        <!-- 📅 주간 일정 카드 (독립된 칸) -->
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">📅 주간 일정</div>
+            <button class="add-btn admin-only" onclick="addWeeklyItem()">+ 추가</button>
           </div>
-
-          <div class="music-player-container">
-            <div class="cd-disc-wrapper">
-              <div class="cd-disc" id="main-cd-disc">
-                <div class="cd-center-hole"></div>
-              </div>
-            </div>
-
-            <div class="song-details">
-              <h2 id="display-song-title" style="font-size: 1.1rem; font-weight: 900; color: var(--accent-color);">재생 중인 노래가 없습니다</h2>
-              <p id="display-song-singer" style="font-size: 0.85rem; font-weight: 700; opacity: 0.8;"></p>
-            </div>
-
-            <audio id="html5-audio-element" onended="skipSong(1)"></audio>
-
-            <div class="player-btn-group">
-              <button class="player-action-btn" onclick="skipSong(-1)" title="이전 곡">⏮️</button>
-              <button class="player-action-btn player-main-play" id="play-pause-ctrl-btn" onclick="togglePlayMusic()">▶️ 재생</button>
-              <button class="player-action-btn" onclick="skipSong(1)" title="다음 곡">⏭️</button>
-            </div>
-
-            <!-- 음량 조절 바 -->
-            <div class="volume-slider-box">
-              <span>🔊 볼륨</span>
-              <input type="range" id="volume-range-input" min="0" max="1" step="0.05" value="1" oninput="changeAudioVolume(this.value)">
-            </div>
-
-            <!-- 재생목록 접기/펼치기 토글 버튼 -->
-            <button class="playlist-toggle-btn" onclick="togglePlaylistAccordion()">🎵 재생목록 펼치기/접기</button>
-            
-            <div class="playlist-accordion-content" id="playlist-accordion-box">
-              <div class="admin-only" style="margin-bottom: 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <input type="file" id="cd-image-file" accept="image/*" style="display: none;" onchange="handleCdImageUpload(event)">
-                <label for="cd-image-file" class="add-btn" style="cursor: pointer; font-size: 0.75rem;">🖼️ CD 이미지 업로드</label>
-                <button class="add-btn" onclick="resetCdImage()" style="background: var(--card-bg); font-size: 0.75rem;">기본 CD 초기화</button>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <span style="font-size: 0.8rem; font-weight: 900; color: var(--accent-color);">플레이리스트</span>
-                <button class="add-btn admin-only" onclick="addSongItem()" style="font-size: 0.75rem;">+ 노래 추가</button>
-              </div>
-              <div class="list-wrapper" id="playlist-editor-list" style="gap: 6px;"></div>
-            </div>
-          </div>
+          <div class="list-wrapper weekly-schedule-card" id="weekly-schedule-list"></div>
         </div>
       </div>
     </div>
@@ -1346,278 +1131,9 @@
         if (localStorage.getItem('is_dark_mode') === 'true') {
           document.body.classList.add('dark-mode');
           const btn = document.getElementById('dark-mode-toggle-btn');
-          if (btn) btn.textContent = '☀️️ 라이트';
+          if (btn) btn.textContent = '☀️ 라이트';
         }
       } catch(e) {}
-    }
-
-    /* 💽 방문자별 개별 독립 음악 재생 플레이어 상태 및 로직 (완전 분리 및 안전 보장) */
-    let musicState = {
-      cdImg: "",
-      currentIndex: 0,
-      isPlaying: false,
-      volume: 1,
-      songs: [
-        ["Snow halation", "Aqours", "song1.mp3"],
-        ["FULL MOON", "메루", "song2.mp3"]
-      ]
-    };
-
-    function changeAudioVolume(val) {
-      const audioEl = document.getElementById('html5-audio-element');
-      const v = parseFloat(val);
-      musicState.volume = v;
-      if (audioEl) audioEl.volume = v;
-      saveMusicToLocal();
-    }
-
-    function togglePlaylistAccordion() {
-      const box = document.getElementById('playlist-accordion-box');
-      if (box) box.classList.toggle('open');
-    }
-
-    function updateMusicPlayerUI() {
-      const titleEl = document.getElementById('display-song-title');
-      const singerEl = document.getElementById('display-song-singer');
-      const cdDisc = document.getElementById('main-cd-disc');
-      const playBtn = document.getElementById('play-pause-ctrl-btn');
-      const volRange = document.getElementById('volume-range-input');
-
-      if (volRange && musicState.volume !== undefined) {
-        volRange.value = musicState.volume;
-      }
-
-      const songs = musicState.songs || [];
-      if (songs.length === 0) {
-        if (titleEl) titleEl.textContent = "재생할 노래가 없습니다";
-        if (singerEl) singerEl.textContent = "";
-        return;
-      }
-
-      if (musicState.currentIndex < 0) musicState.currentIndex = songs.length - 1;
-      if (musicState.currentIndex >= songs.length) musicState.currentIndex = 0;
-
-      const current = songs[musicState.currentIndex];
-      const title = current[0] || '제목 없음';
-      const singer = current[1] || '가수 미상';
-
-      if (titleEl) titleEl.textContent = title;
-      if (singerEl) singerEl.textContent = singer;
-
-      if (cdDisc) {
-        if (musicState.cdImg) {
-          cdDisc.style.backgroundImage = `url(${musicState.cdImg})`;
-          cdDisc.style.backgroundColor = 'transparent';
-        } else {
-          cdDisc.style.backgroundImage = 'none';
-          cdDisc.style.backgroundColor = '#222';
-        }
-        if (musicState.isPlaying) {
-          cdDisc.classList.add('spinning');
-          if (playBtn) playBtn.textContent = '⏸️ 일시정지';
-        } else {
-          cdDisc.classList.remove('spinning');
-          if (playBtn) playBtn.textContent = '▶️ 재생';
-        }
-      }
-    }
-
-    function togglePlayMusic() {
-      const audioEl = document.getElementById('html5-audio-element');
-      const songs = musicState.songs || [];
-      if (songs.length === 0) return;
-
-      if (musicState.isPlaying) {
-        try { audioEl.pause(); } catch(e) {}
-        musicState.isPlaying = false;
-        saveMusicToLocal();
-        updateMusicPlayerUI();
-      } else {
-        const currentPath = songs[musicState.currentIndex][2] || '';
-        if (audioEl.src !== currentPath && currentPath) {
-          audioEl.src = currentPath;
-        }
-        audioEl.volume = musicState.volume !== undefined ? musicState.volume : 1;
-        
-        audioEl.play().then(() => {
-          musicState.isPlaying = true;
-          updateMusicPlayerUI();
-          saveMusicToLocal();
-        }).catch(err => {
-          console.warn("오디오 재생 오류 방어됨 (음원 파일 경로를 확인해주세요):", err);
-          musicState.isPlaying = false;
-          updateMusicPlayerUI();
-        });
-      }
-    }
-
-    function skipSong(direction) {
-      const audioEl = document.getElementById('html5-audio-element');
-      musicState.currentIndex += direction;
-      const songs = musicState.songs || [];
-      if (musicState.currentIndex < 0) musicState.currentIndex = songs.length - 1;
-      if (musicState.currentIndex >= songs.length) musicState.currentIndex = 0;
-
-      try { audioEl.pause(); } catch(e) {}
-      audioEl.currentTime = 0;
-      musicState.isPlaying = false;
-      updateMusicPlayerUI();
-      saveMusicToLocal();
-
-      if (songs.length > 0 && songs[musicState.currentIndex][2]) {
-        audioEl.src = songs[musicState.currentIndex][2];
-        audioEl.volume = musicState.volume !== undefined ? musicState.volume : 1;
-        audioEl.play().then(() => {
-          musicState.isPlaying = true;
-          updateMusicPlayerUI();
-          saveMusicToLocal();
-        }).catch(e => {
-          musicState.isPlaying = false;
-          updateMusicPlayerUI();
-        });
-      }
-    }
-
-    function handleCdImageUpload(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 400; canvas.height = 400; // 용량 최적화
-            const ctx = canvas.getContext('2d');
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(img, 0, 0, 400, 400);
-            const compressed = canvas.toDataURL('image/jpeg', 0.85);
-            musicState.cdImg = compressed;
-            updateMusicPlayerUI();
-            saveMusicToLocal();
-          };
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function resetCdImage() {
-      musicState.cdImg = "";
-      updateMusicPlayerUI();
-      saveMusicToLocal();
-    }
-
-    function saveMusicToLocal() {
-      try {
-        localStorage.setItem('visitor_music_state', JSON.stringify({
-          currentIndex: musicState.currentIndex,
-          volume: musicState.volume,
-          cdImg: musicState.cdImg,
-          songs: musicState.songs
-        }));
-      } catch(e) {}
-    }
-
-    function loadMusicFromLocal() {
-      try {
-        const saved = localStorage.getItem('visitor_music_state');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && typeof parsed === 'object') {
-            if (parsed.currentIndex !== undefined) musicState.currentIndex = parsed.currentIndex;
-            if (parsed.volume !== undefined) musicState.volume = parsed.volume;
-            if (parsed.cdImg !== undefined) musicState.cdImg = parsed.cdImg;
-            if (Array.isArray(parsed.songs) && parsed.songs.length > 0) musicState.songs = parsed.songs;
-          }
-        }
-      } catch(e) {}
-    }
-
-    function renderPlaylistEditor() {
-      const listEl = document.getElementById('playlist-editor-list');
-      if (!listEl) return;
-      const songs = musicState.songs || [];
-      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
-
-      if (!isAdmin) {
-        listEl.innerHTML = songs.map((song, idx) => `
-          <div class="item-row" style="padding: 10px 14px; justify-content: space-between; align-items: center; background: var(--item-bg); border-radius: 14px; border: 1.5px solid var(--item-border);">
-            <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
-              <span style="font-weight: 800; color: var(--accent-color); font-size: 0.78rem;">#${idx + 1}</span>
-              <span style="font-weight: 700; color: var(--text-color); font-size: 0.86rem; word-break: break-all;">${escapeHtml(song[0])}</span>
-            </div>
-            <span style="font-weight: 700; opacity: 0.75; font-size: 0.8rem; white-space: nowrap; margin-left: 8px;">${escapeHtml(song[1])}</span>
-          </div>
-        `).join('');
-      } else {
-        listEl.innerHTML = songs.map((song, idx) => `
-          <div class="item-row playlist-row" data-index="${idx}" style="flex-direction:column; align-items:flex-start; gap:6px; padding:10px 12px;">
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-              <span style="font-weight:900; color:var(--accent-color); font-size:0.78rem;">🎵 TRACK #${idx + 1}</span>
-              <div style="display:flex; gap:4px;">
-                <button class="move-btn" type="button" onclick="moveSongUp(${idx})">⬆️</button>
-                <button class="move-btn" type="button" onclick="moveSongDown(${idx})">⬇️️</button>
-                <button class="del-btn" type="button" onclick="removeSong(${idx})">×</button>
-              </div>
-            </div>
-            <div style="display:flex; gap:6px; width:100%;">
-              <input type="text" class="text-input song-title-input" value="${escapeAttr(song[0])}" placeholder="노래 제목" oninput="updatePlaylistFromDOM()" style="flex:1; padding:6px 10px; font-size:0.8rem;">
-              <input type="text" class="text-input song-singer-input" value="${escapeAttr(song[1])}" placeholder="가수" oninput="updatePlaylistFromDOM()" style="width:90px; padding:6px 10px; font-size:0.8rem;">
-            </div>
-            <input type="text" class="url-input song-url-input" value="${escapeAttr(song[2])}" placeholder="GitHub 파일명 (song1.mp3)" oninput="updatePlaylistFromDOM()" style="padding:6px 10px; font-size:0.8rem;">
-          </div>
-        `).join('');
-      }
-    }
-
-    function addSongItem() {
-      if (!musicState.songs) musicState.songs = [];
-      musicState.songs.push(["새 노래 제목", "가수 이름", "song.mp3"]);
-      renderPlaylistEditor();
-      saveMusicToLocal();
-    }
-
-    function removeSong(idx) {
-      musicState.songs.splice(idx, 1);
-      renderPlaylistEditor();
-      updateMusicPlayerUI();
-      saveMusicToLocal();
-    }
-
-    function moveSongUp(idx) {
-      if (idx > 0) {
-        const temp = musicState.songs[idx];
-        musicState.songs[idx] = musicState.songs[idx - 1];
-        musicState.songs[idx - 1] = temp;
-        renderPlaylistEditor();
-        saveMusicToLocal();
-      }
-    }
-
-    function moveSongDown(idx) {
-      const songs = musicState.songs || [];
-      if (idx < songs.length - 1) {
-        const temp = musicState.songs[idx];
-        musicState.songs[idx] = musicState.songs[idx + 1];
-        musicState.songs[idx + 1] = temp;
-        renderPlaylistEditor();
-        saveMusicToLocal();
-      }
-    }
-
-    function updatePlaylistFromDOM() {
-      const rows = document.querySelectorAll('.playlist-row');
-      const newSongs = [];
-      rows.forEach(row => {
-        const title = row.querySelector('.song-title-input')?.value.trim() || '';
-        const singer = row.querySelector('.song-singer-input')?.value.trim() || '';
-        const url = row.querySelector('.song-url-input')?.value.trim() || '';
-        if (title || url) newSongs.push([title, singer, url]);
-      });
-      musicState.songs = newSongs;
-      saveMusicToLocal();
-      updateMusicPlayerUI();
     }
 
     /* 💡 관리자 세션 상태 안전 관리자 (Fail-Safe Storage) */
@@ -1877,6 +1393,7 @@
     let pageState = { achievements: 1, games: 1, tmi: 1 };
     let pageLimit = { achievements: 30, games: 30, tmi: 30 };
 
+    /* 💡 현재 연/월 자동 감지 */
     const _initDate = new Date();
     let currentYear = _initDate.getFullYear();
     let currentMonth = _initDate.getMonth();
@@ -1907,6 +1424,10 @@
         ["방송국 (SOOP)", "https://sooplive.co.kr"], ["팬카페", "https://cafe.naver.com/cutemeru"],
         ["메루유튜브", "https://www.youtube.com/@_merurun"], ["메루띠띠", "https://www.youtube.com/@%EB%A9%94%EB%A3%A8%ED%8C%AC%EC%B1%84%EB%84%90"],
         ["팬심", "https://fancim.me/celeb/profile.aspx?cu_id=meuuu3"]
+      ],
+      weeklySchedule: [
+        ["월요일", "정기 휴방 💤"], ["화요일", "종합 게임 방송 🎮"], ["수요일", "소통 및 마인크래프트 ⛏️"],
+        ["목요일", "공포 게임 데이 😱"], ["금요일", "그림 핀볼 이벤트 🎨"], ["토요일", "합방 및 대형 컨텐츠 🏆"], ["일요일", "자율 방송 / 랜덤 🎲"]
       ],
       anniversaries: [["2026-11-05", "1000일"]],
       mcServers: ["랜드마꾸", "버니버스", "마카오톡", "레오펠", "숲길", "호구와트", "마령전(퍼가욤)", "오함마3(납득단)", "마친다", "돌발서", "맹든링", "하루살이", "충동서버", "린코레일2", "삼국지", "후국지", "오프라인"],
@@ -2239,6 +1760,14 @@
           if (name || url) storeData.links.push([name, url]);
         });
 
+        const weeklyItems = document.querySelectorAll('#weekly-schedule-list .weekly-row');
+        storeData.weeklySchedule = [];
+        weeklyItems.forEach(item => {
+          const day = item.querySelector('.weekly-day-edit')?.textContent.trim() || item.querySelector('.weekly-day-badge')?.textContent.trim() || '';
+          const text = item.querySelector('.weekly-text')?.textContent.trim() || '';
+          if (day || text) storeData.weeklySchedule.push([day, text]);
+        });
+
         const annivItems = document.querySelectorAll('#anniv-list .anniv-item');
         storeData.anniversaries = [];
         annivItems.forEach(item => {
@@ -2412,6 +1941,21 @@
           `).join('');
         }
 
+        const weeklyList = document.getElementById('weekly-schedule-list');
+        if (weeklyList && data.weeklySchedule) {
+          weeklyList.innerHTML = data.weeklySchedule.map(item => `
+            <div class="weekly-row">
+              <span class="weekly-day-badge" contenteditable="false">${escapeHtml(item[0])}</span>
+              <span class="weekly-text" contenteditable="false">${escapeHtml(item[1])}</span>
+              <div class="admin-only flex" style="gap:4px; align-items:center;">
+                <button class="move-btn" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn" onclick="moveRowDown(this)">⬇️</button>
+                <button class="del-btn" onclick="this.closest('.weekly-row').remove(); triggerAutoSave();">×</button>
+              </div>
+            </div>
+          `).join('');
+        }
+
         const annivList = document.getElementById('anniv-list');
         if (annivList && Array.isArray(data.anniversaries)) {
           annivList.innerHTML = data.anniversaries.map(item => {
@@ -2456,6 +2000,199 @@
       } catch(e) {}
     }
 
+    function addWeeklyItem() {
+      const list = document.getElementById('weekly-schedule-list');
+      if (!list) return;
+      const div = document.createElement('div');
+      div.className = 'weekly-row';
+      div.innerHTML = `
+        <span class="weekly-day-badge weekly-day-edit" contenteditable="true">요일</span>
+        <span class="weekly-text" contenteditable="true">일정 내용</span>
+        <div class="admin-only flex" style="gap:4px; align-items:center;">
+          <button class="move-btn" onclick="moveRowUp(this)">⬆️️</button>
+          <button class="move-btn" onclick="moveRowDown(this)">⬇️</button>
+          <button class="del-btn" onclick="this.closest('.weekly-row').remove(); triggerAutoSave();">×</button>
+        </div>
+      `;
+      list.appendChild(div);
+      setEditable(true);
+      triggerAutoSave();
+    }
+
+    function renderOgqList(ogqArr) {
+      const listEl = document.getElementById('ogq-grid-list');
+      if (!listEl) return;
+      const list = (ogqArr && ogqArr.length > 0) ? ogqArr : (storeData.ogqList || []);
+      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
+
+      listEl.innerHTML = list.map((item, idx) => {
+        const imgSrc = item[0] || 'https://via.placeholder.com/80';
+        const linkUrl = item[1] || '#';
+        return `
+          <div class="ogq-item-card" data-link="${escapeAttr(linkUrl)}" onclick="handleOgqClick(this, '${escapeAttr(linkUrl)}')">
+            <img src="${escapeAttr(imgSrc)}" class="ogq-item-img" alt="OGQ">
+            <div class="ogq-edit-overlay admin-only">
+              <input type="file" id="ogq-file-${idx}" accept="image/*" style="display:none;" onchange="handleOgqImageUpload(event, ${idx})">
+              <label for="ogq-file-${idx}" class="move-btn" style="cursor:pointer; font-size:0.6rem; padding:2px 4px;">🖼️ 이미지</label>
+              <input type="text" class="url-input ogq-link-input" value="${escapeAttr(linkUrl)}" placeholder="이동 링크 URL" oninput="updateOgqFromDOM(); triggerAutoSave();" style="font-size:0.6rem; padding:2px 4px; height:20px;">
+              <button class="del-btn" onclick="event.stopPropagation(); removeOgqItem(${idx})" style="font-size:0.7rem; color:#fff;">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleOgqClick(cardEl, url) {
+      if (document.body.classList.contains('admin-mode')) return;
+      if (url && url !== '#' && url.trim() !== '') {
+        window.open(url, '_blank');
+      }
+    }
+
+    function addOgqItem() {
+      if (!storeData.ogqList) storeData.ogqList = [];
+      storeData.ogqList.push(["https://via.placeholder.com/80", "https://"]);
+      renderOgqList(storeData.ogqList);
+      triggerAutoSave();
+    }
+
+    function removeOgqItem(idx) {
+      if (storeData.ogqList && storeData.ogqList.length > idx) {
+        storeData.ogqList.splice(idx, 1);
+        renderOgqList(storeData.ogqList);
+        triggerAutoSave();
+      }
+    }
+
+    function handleOgqImageUpload(e, idx) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300; canvas.height = 300;
+            canvas.getContext('2d').drawImage(img, 0, 0, 300, 300);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+            if (!storeData.ogqList[idx]) storeData.ogqList[idx] = ["", ""];
+            storeData.ogqList[idx][0] = compressed;
+            renderOgqList(storeData.ogqList);
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateOgqFromDOM() {
+      const cards = document.querySelectorAll('.ogq-item-card');
+      const newList = [];
+      cards.forEach(card => {
+        const img = card.querySelector('.ogq-item-img');
+        const input = card.querySelector('.ogq-link-input');
+        const imgSrc = img ? (img.getAttribute('src') || img.src || '') : '';
+        const linkVal = input ? input.value.trim() : '#';
+        newList.push([imgSrc, linkVal]);
+      });
+      storeData.ogqList = newList;
+    }
+
+    function handleSigBalloonImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 400; canvas.height = 405;
+            canvas.getContext('2d').drawImage(img, 0, 0, 400, 405);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+            const sigBalloonEl = document.getElementById('sig-balloon-img-element');
+            if (sigBalloonEl) {
+              sigBalloonEl.src = compressed;
+              sigBalloonEl.setAttribute('src', compressed);
+            }
+            storeData.sigBalloonImg = compressed;
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function populateRestoredData(overrideData = null) {
+      const targetData = overrideData || storeData;
+      const achList = document.getElementById('achievement-list');
+      const gameList = document.getElementById('game-list');
+      const tmiList = document.getElementById('tmi-list');
+
+      if (achList && targetData.achievements) {
+        achList.innerHTML = targetData.achievements.map((item, index) => `
+          <div class="item-row achievement-item" id="achieve-item-${index}">
+            <span class="anniv-date" contenteditable="false">${escapeHtml(item[0])}</span>
+            <span class="info-text" contenteditable="false">${escapeHtml(item[1])}</span>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
+            <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+          </div>
+        `).join('');
+      }
+
+      if (gameList && targetData.games) {
+        gameList.innerHTML = targetData.games.map((item, index) => `
+          <div class="game-card-item" id="game-card-${index}">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <h3 contenteditable="false" class="game-title" style="font-size:1.05rem; color:var(--accent-color); font-weight:800; flex:1;">${escapeHtml(item[0])}</h3>
+              <select class="select-input game-rating-select" style="font-size:0.85rem;" onchange="this.querySelectorAll('option').forEach(o => o.removeAttribute('selected')); this.options[this.selectedIndex].setAttribute('selected', 'selected'); triggerAutoSave();">
+                <option value="⭐⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐⭐ (6점)</option>
+                <option value="⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐ (5점)</option>
+                <option value="⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐ (4점)</option>
+                <option value="⭐⭐⭐" ${item[1]==='⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐ (3점)</option>
+                <option value="⭐⭐" ${item[1]==='⭐⭐'?'selected="selected"':''}>⭐⭐ (2점)</option>
+                <option value="⭐" ${item[1]==='⭐'?'selected="selected"':''}>⭐ (1점)</option>
+                <option value="☆☆☆☆☆☆" ${item[1]==='☆☆☆☆☆☆'?'selected="selected"':''}>☆☆☆☆☆☆ (0점 / 빈칸)</option>
+                <option value="별점 없음" ${item[1]==='별점 없음'?'selected="selected"':''}>별점 없음</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color);">📅 플레이한 날짜:</span>
+              <span contenteditable="false" class="game-date-text" style="font-size:0.85rem; font-weight:700; color:var(--text-color);">${escapeHtml(item[2])}</span>
+            </div>
+            <div>
+              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color); display:block; margin-bottom:4px;">📝 후기:</span>
+              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border); white-space:pre-wrap;">${escapeHtml(item[3])}</div>
+            </div>
+            <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
+              <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+              <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️️</button>
+              <button class="del-btn admin-only" onclick="this.closest('.game-card-item').remove(); updateAllPaginations(); triggerAutoSave();">삭제 ×</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (tmiList && targetData.tmi) {
+        tmiList.innerHTML = targetData.tmi.map((item, index) => `
+          <div class="item-row tmi-item" id="tmi-item-${index}" style="flex-direction:column; align-items:flex-start; gap:8px;">
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+              <span contenteditable="false" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706; box-shadow:none;">${escapeHtml(item[0])}</span>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
+                <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+              </div>
+            </div>
+            <div contenteditable="false" class="tmi-content-text" style="font-size:0.9rem; color:var(--text-color); line-height:1.6; width:100%; white-space:pre-wrap;">${escapeHtml(item[1])}</div>
+          </div>
+        `).join('');
+      }
+    }
+
     function loadFromLocalStorage() {
       try {
         const localStore = localStorage.getItem('local_store_data');
@@ -2468,15 +2205,9 @@
           const parsedCal = JSON.parse(localCal);
           if (parsedCal) calendarEvents = parsedCal;
         }
-      } catch(e) {
-        localStorage.removeItem('local_store_data');
-        localStorage.removeItem('local_cal_events');
-      }
+      } catch(e) {}
 
-      loadMusicFromLocal();
       renderFromJSON(storeData);
-      renderPlaylistEditor();
-      updateMusicPlayerUI();
 
       if (!storeData.profile || !storeData.profile.img) {
         ImageStore.getImage('profile_img').then(idbImg => {
