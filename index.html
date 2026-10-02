@@ -726,7 +726,7 @@
           <div class="card main-card-item" id="card-video">
             <div class="section-header">
               <div class="section-title">🎥 대표 영상</div>
-              <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇️️</button></div>
+              <div class="card-move-btns admin-only"><button class="move-btn" onclick="moveCardUp(this)">⬆️</button><button class="move-btn" onclick="moveCardDown(this)">⬇</button></div>
             </div>
             <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 16px; border: 1.5px solid var(--card-border); background: #000000;">
               <iframe id="main-video-iframe" src="https://vod.sooplive.com/player/204935355" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; border: none;"></iframe>
@@ -894,7 +894,7 @@
   <!-- 📋 모달: 다목적 여러 줄 붙여넣기 -->
   <div class="modal-overlay" id="bulk-paste-modal">
     <div class="modal-card">
-      <h3>📋 여러 줄 한 번에 붙여넣기</h3>
+      <h3 id="bulk-paste-title">📋 여러 줄 한 번에 붙여넣기</h3>
       <textarea id="bulk-paste-text" placeholder="내용을 여기에 붙여넣으세요..."></textarea>
       <div class="modal-btns">
         <button class="btn-submit" onclick="applyBulkPaste()">생성하기</button>
@@ -922,7 +922,7 @@
         if (localStorage.getItem('is_dark_mode') === 'true') {
           document.body.classList.add('dark-mode');
           const btn = document.getElementById('dark-mode-toggle-btn');
-          if (btn) btn.textContent = '☀️ 라이트';
+          if (btn) btn.textContent = '☀️️ 라이트';
         }
       } catch(e) {}
     }
@@ -1300,7 +1300,7 @@
         ["💡 TMI", "50. 생일 역조공 이벤트 (Full moon 커버곡 공개) FULL MOON"],
         ["💡 TMI", "51. 연어장을 좋아한다 !"],
         ["💡 TMI", "52. 로볼록스 등산 대회에서 총 3번을 완주했다."],
-        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞ｄａ𝐲]"],
+        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞ｄ𝐚𝐲]"],
         ["💡 TMI", "54. 4.12 ~ 18일 첫 다이아 서버 [야너다] 22시간 남기고 졸업!"],
         ["💡 TMI", "55. 4.17일 워든 신전 첫 트라이 ! 수선책도 하나 얻었다 !"],
         ["💡 TMI", "56. 파티 애니멀즈 버종대 출전 (메냥이펌피럼)"],
@@ -1436,8 +1436,8 @@
       gridItems.forEach(item => {
         const lbl = item.querySelector('.info-box-label')?.textContent.trim() || '';
         const val = item.querySelector('.info-box-val')?.textContent.trim() 
-                 || item.querySelector('.stream-days-badge')?.textContent.trim() 
-                 || '';
+               || item.querySelector('.stream-days-badge')?.textContent.trim() 
+               || '';
         const isFull = item.classList.contains('full-width');
         if (lbl || val) storeData.infoGrid.push([lbl, val, isFull]);
       });
@@ -1451,7 +1451,6 @@
         if (name || url) storeData.links.push([name, url]);
       });
 
-      // 💡 주간 일정은 항상 달력의 최신 이번 주 일정으로 동기화하여 저장 (DOM에서 긁어오지 않아 유령 데이터 생성 차단)
       syncWeeklyScheduleFromCalendar();
 
       const annivItems = document.querySelectorAll('#anniv-list .anniv-item');
@@ -1668,7 +1667,7 @@
 
       populateRestoredData(data);
       updateAllPaginations();
-      syncWeeklyScheduleFromCalendar(); // 💡 주간 일정을 항상 최신 달력 데이터 기준으로 동기화하여 출력
+      syncWeeklyScheduleFromCalendar();
 
       if (getAdminState()) {
         enterAdminMode();
@@ -1839,7 +1838,6 @@
       if (tabId === 'monthly') renderCalendar();
     }
 
-    /* 💡 모달에서 특정 일정을 직접 삭제할 수 있는 함수 (모바일 편의성) */
     function deleteCalendarEvent(dateKey, index) {
       if (!calendarEvents[dateKey]) return;
       calendarEvents[dateKey].splice(index, 1);
@@ -1847,7 +1845,7 @@
         delete calendarEvents[dateKey];
       }
       renderCalendar();
-      openDayEventsModal(dateKey); // 모달 화면 새로고침
+      openDayEventsModal(dateKey);
       triggerAutoSave();
     }
 
@@ -2352,7 +2350,6 @@
         calBody.appendChild(cell);
       }
       
-      // 💡 달력 갱신 시 주간 일정을 항상 100% 실시간 연동
       syncWeeklyScheduleFromCalendar();
     }
 
@@ -2404,12 +2401,9 @@
       triggerAutoSave();
     }
 
-    /* 💡 [핵심 해결] 월간 일정 -> 주간 일정 완전 동기화 함수
-       (이번 주 월요일 ~ 일요일 기준 7일간의 달력 일정을 빈틈없이 수집) */
     function syncWeeklyScheduleFromCalendar() {
       const now = new Date();
-      const currentDay = now.getDay(); // 0(일), 1(월), ..., 6(토)
-      // 한국 표준 주간 기준: 이번 주 월요일부터 일요일까지
+      const currentDay = now.getDay();
       const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
       const monday = new Date(now);
       monday.setDate(now.getDate() + distanceToMonday);
@@ -2427,7 +2421,6 @@
         const dateKey = `${y}-${m}-${dayNum}`;
         const dayName = weekDays[d.getDay()];
 
-        // 💡 dateKey 형식(2026-8-21 및 2026-08-21 둘 다 호환 확인)
         const evts = calendarEvents[dateKey] || calendarEvents[formatYMD(dateKey)] || [];
         if (evts.length > 0) {
           evts.forEach(evt => {
@@ -2442,7 +2435,6 @@
         }
       }
 
-      // 💡 [중요] 일정이 0개(전부 삭제)여도 이전 스케줄이 남지 않도록 무조건 덮어씀
       storeData.schedules = autoSchedules;
 
       const schList = document.getElementById('schedule-list');
@@ -2542,7 +2534,7 @@
     function addProfileInfoItem() {
       const grid = document.querySelector('.profile-info-grid'); if (!grid) return;
       const div = document.createElement('div'); div.className = 'info-box-item';
-      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
+      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
       grid.appendChild(div); setEditable(true); triggerAutoSave();
     }
 
@@ -2633,7 +2625,7 @@
         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
           <span contenteditable="true" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706;">💡 TMI</span>
           <div style="display:flex; gap:4px; align-items:center;">
-            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️️</button>
             <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
             <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
           </div>
@@ -2769,7 +2761,13 @@
 
             if (!storeData.profile) storeData.profile = {};
             storeData.profile.img = compressed;
+            
+            // 💡 최신 사진을 IndexedDB와 localStorage에 확실히 저장
             ImageStore.saveImage('profile_img', compressed);
+            try {
+              localStorage.setItem('local_store_data', JSON.stringify(storeData));
+            } catch(err) {}
+
             triggerAutoSave();
           };
           img.src = evt.target.result;
@@ -2822,17 +2820,24 @@
 
       renderFromJSON(storeData);
 
-      if (!storeData.profile || !storeData.profile.img) {
+      // 💡 현재 프로필 사진이 유효하지 않거나 비어있을 때만 IndexedDB에서 불러오기
+      const currentImg = storeData.profile?.img || '';
+      const isPlaceholder = !currentImg || currentImg.includes('via.placeholder.com');
+
+      if (isPlaceholder) {
         ImageStore.getImage('profile_img').then(idbImg => {
-          if (idbImg && (!storeData.profile || !storeData.profile.img)) {
+          if (idbImg) {
             const imgEl = document.getElementById('profile-img-element');
             if (imgEl) {
               imgEl.src = idbImg;
               imgEl.setAttribute('src', idbImg);
             }
+            if (!storeData.profile) storeData.profile = {};
+            storeData.profile.img = idbImg;
           }
         });
       }
+
       if (getAdminState()) enterAdminMode();
       else exitAdminMode();
     }
