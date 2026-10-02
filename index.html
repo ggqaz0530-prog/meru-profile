@@ -1351,7 +1351,7 @@
       } catch(e) {}
     }
 
-    /* 💽 방문자별 개별 독립 음악 재생 플레이어 상태 및 로직 (서버 동기화 제외) */
+    /* 💽 방문자별 개별 독립 음악 재생 플레이어 상태 및 로직 (서버 동기화 완전 제외) */
     let musicState = {
       cdImg: "",
       currentIndex: 0,
@@ -1428,10 +1428,11 @@
       if (songs.length === 0) return;
 
       if (musicState.isPlaying) {
-        // 일시정지 시 현재 재생 중인 위치(currentTime) 유지
+        // 일시정지 시 현재 위치(currentTime) 유지
         audioEl.pause();
         musicState.isPlaying = false;
         saveMusicToLocal();
+        updateMusicPlayerUI();
       } else {
         const currentPath = songs[musicState.currentIndex][2] || '';
         if (audioEl.src !== currentPath && currentPath) {
@@ -1444,12 +1445,11 @@
           updateMusicPlayerUI();
           saveMusicToLocal();
         }).catch(err => {
-          alert('오디오 재생 실패: 깃허브에 파일이 정상적으로 업로드되었는지, 경로가 올바른지 확인해주세요.');
+          console.warn("오디오 재생 실패 (파일 누락 또는 브라우저 정책):", err);
           musicState.isPlaying = false;
           updateMusicPlayerUI();
         });
       }
-      updateMusicPlayerUI();
     }
 
     function skipSong(direction) {
@@ -1472,7 +1472,10 @@
           musicState.isPlaying = true;
           updateMusicPlayerUI();
           saveMusicToLocal();
-        }).catch(e => {});
+        }).catch(e => {
+          musicState.isPlaying = false;
+          updateMusicPlayerUI();
+        });
       }
     }
 
@@ -2405,7 +2408,7 @@
                   <span class="info-box-val" id="first-stream-text" contenteditable="false">${escapeHtml(val)}</span>
                 </div>
                 <button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button>
-                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️️</button>
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button>
                 <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
                 <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
               </div>`;
@@ -2481,7 +2484,7 @@
           <div class="mc-tag-item">
             <span contenteditable="false" class="mc-tag-text">${escapeHtml(item)}</span>
             <button class="move-btn admin-only" onclick="moveRowUp(this)">⬅️</button>
-            <button class="move-btn admin-only" onclick="moveRowDown(this)">➡️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">➡️️</button>
             <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
           </div>
         `).join('');
