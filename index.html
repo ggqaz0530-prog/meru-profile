@@ -1300,7 +1300,7 @@
         ["💡 TMI", "50. 생일 역조공 이벤트 (Full moon 커버곡 공개) FULL MOON"],
         ["💡 TMI", "51. 연어장을 좋아한다 !"],
         ["💡 TMI", "52. 로볼록스 등산 대회에서 총 3번을 완주했다."],
-        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞ｄ𝐚𝐲]"],
+        ["💡 TMI", "53. 화이트데이 기념 단체 커버곡 공개 わたしの一番かわいいところ【뉴냥이X레티아X메루X밍키X뱌링X차쯔키】 [𝟐𝟎𝟐𝟓_𝐖𝐡𝐢𝐭𝐞𝐝𝐚𝐲]"],
         ["💡 TMI", "54. 4.12 ~ 18일 첫 다이아 서버 [야너다] 22시간 남기고 졸업!"],
         ["💡 TMI", "55. 4.17일 워든 신전 첫 트라이 ! 수선책도 하나 얻었다 !"],
         ["💡 TMI", "56. 파티 애니멀즈 버종대 출전 (메냥이펌피럼)"],
@@ -1394,12 +1394,12 @@
       const pBio = document.getElementById('profile-bio')?.textContent.trim() || '';
       const profileImgEl = document.getElementById('profile-img-element');
       const pImgSrc = profileImgEl ? (profileImgEl.getAttribute('src') || profileImgEl.src || '') : '';
-      const isPlaceholder = pImgSrc.includes('via.placeholder.com');
+      const isPlaceholder = !pImgSrc || pImgSrc.includes('via.placeholder.com');
 
       storeData.profile = { 
         name: pName, 
         bio: pBio, 
-        img: (!isPlaceholder && pImgSrc) ? pImgSrc : (storeData.profile?.img || '') 
+        img: (!isPlaceholder) ? pImgSrc : (storeData.profile?.img || '') 
       };
 
       const gameBioEl = document.getElementById('game-bio');
@@ -1543,9 +1543,14 @@
 
       if (nameEl && data.profile && data.profile.name) nameEl.textContent = data.profile.name;
       if (bioEl && data.profile && data.profile.bio) bioEl.textContent = data.profile.bio;
+      
+      // 💡 [핵심 수정] 유효한 이미지 데이터가 존재할 때만 프로필 이미지를 반영합니다.
       if (imgEl && data.profile && data.profile.img) {
-        imgEl.src = data.profile.img;
-        imgEl.setAttribute('src', data.profile.img);
+        const imgVal = data.profile.img;
+        if (imgVal && !imgVal.includes('via.placeholder.com')) {
+          imgEl.src = imgVal;
+          imgEl.setAttribute('src', imgVal);
+        }
       }
 
       if (gameBioEl) {
@@ -1734,7 +1739,7 @@
               <span contenteditable="false" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706; box-shadow:none;">${escapeHtml(item[0])}</span>
               <div style="display:flex; gap:4px; align-items:center;">
                 <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️️</button>
                 <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
               </div>
             </div>
@@ -2534,7 +2539,7 @@
     function addProfileInfoItem() {
       const grid = document.querySelector('.profile-info-grid'); if (!grid) return;
       const div = document.createElement('div'); div.className = 'info-box-item';
-      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
+      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
       grid.appendChild(div); setEditable(true); triggerAutoSave();
     }
 
@@ -2625,7 +2630,7 @@
         <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
           <span contenteditable="true" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706;">💡 TMI</span>
           <div style="display:flex; gap:4px; align-items:center;">
-            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️️</button>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
             <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
             <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
           </div>
@@ -2762,13 +2767,13 @@
             if (!storeData.profile) storeData.profile = {};
             storeData.profile.img = compressed;
             
-            // 💡 최신 사진을 IndexedDB와 localStorage에 확실히 저장
+            // 💡 IndexedDB, LocalStorage 저장 및 파이어베이스(서버)에 즉시 강제 반영 저장
             ImageStore.saveImage('profile_img', compressed);
             try {
               localStorage.setItem('local_store_data', JSON.stringify(storeData));
             } catch(err) {}
 
-            triggerAutoSave();
+            savePage(true); // 서버(파이어베이스)로 즉시 업로드 반영
           };
           img.src = evt.target.result;
         };
@@ -2804,7 +2809,7 @@
       triggerAutoSave();
     }
 
-    function loadFromLocalStorage() {
+    async function loadFromLocalStorage() {
       try {
         const localStore = localStorage.getItem('local_store_data');
         const localCal = localStorage.getItem('local_cal_events');
@@ -2818,25 +2823,16 @@
         }
       } catch(e) {}
 
+      // 💡 [핵심 수정] IndexedDB에 저장된 최신 프로필 이미지가 있다면 강제로 storeData에 최우선 반영
+      try {
+        const idbImg = await ImageStore.getImage('profile_img');
+        if (idbImg) {
+          if (!storeData.profile) storeData.profile = {};
+          storeData.profile.img = idbImg;
+        }
+      } catch(e) {}
+
       renderFromJSON(storeData);
-
-      // 💡 현재 프로필 사진이 유효하지 않거나 비어있을 때만 IndexedDB에서 불러오기
-      const currentImg = storeData.profile?.img || '';
-      const isPlaceholder = !currentImg || currentImg.includes('via.placeholder.com');
-
-      if (isPlaceholder) {
-        ImageStore.getImage('profile_img').then(idbImg => {
-          if (idbImg) {
-            const imgEl = document.getElementById('profile-img-element');
-            if (imgEl) {
-              imgEl.src = idbImg;
-              imgEl.setAttribute('src', idbImg);
-            }
-            if (!storeData.profile) storeData.profile = {};
-            storeData.profile.img = idbImg;
-          }
-        });
-      }
 
       if (getAdminState()) enterAdminMode();
       else exitAdminMode();
@@ -2844,35 +2840,47 @@
 
     function initApp() {
       initDarkMode();
-      loadFromLocalStorage();
-      if (isFirebaseActive && db) {
-        db.ref('live_profile_json_v3').on('value', snapshot => {
-          const activeEl = document.activeElement;
-          const isUserTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT' || activeEl.isContentEditable);
-          if (isFirebaseSaving || isUserTyping) return;
+      loadFromLocalStorage().then(() => {
+        if (isFirebaseActive && db) {
+          db.ref('live_profile_json_v3').on('value', snapshot => {
+            const activeEl = document.activeElement;
+            const isUserTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT' || activeEl.isContentEditable);
+            if (isFirebaseSaving || isUserTyping) return;
 
-          const data = snapshot.val();
-          if (data) {
-            if (data.admin_pw) {
-              cloudAdminPw = data.admin_pw;
-              try { localStorage.setItem('admin_pw', data.admin_pw); } catch(e) {}
-            }
-            if (data.storeData) {
-              storeData = data.storeData;
-              if (!storeData.gameBio || getCleanPlainText(storeData.gameBio).length === 0) {
-                storeData.gameBio = DEFAULT_GAME_BIO;
+            const data = snapshot.val();
+            if (data) {
+              if (data.admin_pw) {
+                cloudAdminPw = data.admin_pw;
+                try { localStorage.setItem('admin_pw', data.admin_pw); } catch(e) {}
               }
+              if (data.storeData) {
+                // 💡 만약 파이어베이스에 저장된 이미지 데이터가 비어있거나 플레이스홀더인데, 
+                // 현재 로컬(화면/IndexedDB)에 유효한 사진이 있다면 로컬 사진을 유지하도록 보호합니다.
+                const currentImgEl = document.getElementById('profile-img-element');
+                const currentSrc = currentImgEl ? (currentImgEl.src || '') : (storeData.profile?.img || '');
+                const hasValidLocalImg = currentSrc && !currentSrc.includes('via.placeholder.com');
+
+                if (hasValidLocalImg && (!data.storeData.profile || !data.storeData.profile.img || data.storeData.profile.img.includes('via.placeholder.com'))) {
+                  data.storeData.profile = data.storeData.profile || {};
+                  data.storeData.profile.img = currentSrc;
+                }
+
+                storeData = data.storeData;
+                if (!storeData.gameBio || getCleanPlainText(storeData.gameBio).length === 0) {
+                  storeData.gameBio = DEFAULT_GAME_BIO;
+                }
+              }
+              if (data.cal_events) {
+                try { calendarEvents = JSON.parse(data.cal_events); } catch(e){}
+              }
+              renderFromJSON(storeData);
+              renderCalendar();
             }
-            if (data.cal_events) {
-              try { calendarEvents = JSON.parse(data.cal_events); } catch(e){}
-            }
-            renderFromJSON(storeData);
-            renderCalendar();
-          }
-          if (getAdminState()) enterAdminMode();
-          else exitAdminMode();
-        });
-      }
+            if (getAdminState()) enterAdminMode();
+            else exitAdminMode();
+          });
+        }
+      });
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
