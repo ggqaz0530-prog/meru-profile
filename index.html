@@ -1131,7 +1131,7 @@
         if (localStorage.getItem('is_dark_mode') === 'true') {
           document.body.classList.add('dark-mode');
           const btn = document.getElementById('dark-mode-toggle-btn');
-          if (btn) btn.textContent = '☀️ 라이트';
+          if (btn) btn.textContent = '☀️️ 라이트';
         }
       } catch(e) {}
     }
@@ -1745,8 +1745,8 @@
         gridItems.forEach(item => {
           const lbl = item.querySelector('.info-box-label')?.textContent.trim() || '';
           const val = item.querySelector('.info-box-val')?.textContent.trim() 
-                   || item.querySelector('.stream-days-badge')?.textContent.trim() 
-                   || '';
+                 || item.querySelector('.stream-days-badge')?.textContent.trim() 
+                 || '';
           const isFull = item.classList.contains('full-width');
           if (lbl || val) storeData.infoGrid.push([lbl, val, isFull]);
         });
@@ -1945,8 +1945,8 @@
         if (weeklyList && data.weeklySchedule) {
           weeklyList.innerHTML = data.weeklySchedule.map(item => `
             <div class="weekly-row">
-              <span class="weekly-day-badge" contenteditable="false">${escapeHtml(item[0])}</span>
-              <span class="weekly-text" contenteditable="false">${escapeHtml(item[1])}</span>
+              <span class="weekly-day-badge" contenteditable="${getAdminState() ? 'true' : 'false'}">${escapeHtml(item[0])}</span>
+              <span class="weekly-text" contenteditable="${getAdminState() ? 'true' : 'false'}">${escapeHtml(item[1])}</span>
               <div class="admin-only flex" style="gap:4px; align-items:center;">
                 <button class="move-btn" onclick="moveRowUp(this)">⬆</button>
                 <button class="move-btn" onclick="moveRowDown(this)">⬇️</button>
@@ -1982,7 +1982,7 @@
           mcList.innerHTML = data.mcServers.map(item => `
             <div class="mc-tag-item">
               <span contenteditable="false" class="mc-tag-text">${escapeHtml(item)}</span>
-              <button class="move-btn admin-only" onclick="moveRowUp(this)">⬅️</button>
+              <button class="move-btn admin-only" onclick="moveRowUp(this)">⬅️️</button>
               <button class="move-btn admin-only" onclick="moveRowDown(this)">➡️</button>
               <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
             </div>
@@ -2010,186 +2010,13 @@
         <span class="weekly-text" contenteditable="true">일정 내용</span>
         <div class="admin-only flex" style="gap:4px; align-items:center;">
           <button class="move-btn" onclick="moveRowUp(this)">⬆</button>
-          <button class="move-btn" onclick="moveRowDown(this)">⬇️️</button>
+          <button class="move-btn" onclick="moveRowDown(this)">⬇</button>
           <button class="del-btn" onclick="this.closest('.weekly-row').remove(); triggerAutoSave();">×</button>
         </div>
       `;
       list.appendChild(div);
       setEditable(true);
       triggerAutoSave();
-    }
-
-    function renderOgqList(ogqArr) {
-      const listEl = document.getElementById('ogq-grid-list');
-      if (!listEl) return;
-      const list = (ogqArr && ogqArr.length > 0) ? ogqArr : (storeData.ogqList || []);
-
-      listEl.innerHTML = list.map((item, idx) => {
-        const imgSrc = item[0] || 'https://via.placeholder.com/80';
-        const linkUrl = item[1] || '#';
-        return `
-          <div class="ogq-item-card" data-link="${escapeAttr(linkUrl)}" onclick="handleOgqClick(this, '${escapeAttr(linkUrl)}')">
-            <img src="${escapeAttr(imgSrc)}" class="ogq-item-img" alt="OGQ">
-            <div class="ogq-edit-overlay admin-only">
-              <input type="file" id="ogq-file-${idx}" accept="image/*" style="display:none;" onchange="handleOgqImageUpload(event, ${idx})">
-              <label for="ogq-file-${idx}" class="move-btn" style="cursor:pointer; font-size:0.6rem; padding:2px 4px;">🖼️ 이미지</label>
-              <input type="text" class="url-input ogq-link-input" value="${escapeAttr(linkUrl)}" placeholder="이동 링크 URL" oninput="updateOgqFromDOM(); triggerAutoSave();" style="font-size:0.6rem; padding:2px 4px; height:20px;">
-              <button class="del-btn" onclick="event.stopPropagation(); removeOgqItem(${idx})" style="font-size:0.7rem; color:#fff;">×</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function handleOgqClick(cardEl, url) {
-      if (document.body.classList.contains('admin-mode')) return;
-      if (url && url !== '#' && url.trim() !== '') {
-        window.open(url, '_blank');
-      }
-    }
-
-    function addOgqItem() {
-      if (!storeData.ogqList) storeData.ogqList = [];
-      storeData.ogqList.push(["https://via.placeholder.com/80", "https://"]);
-      renderOgqList(storeData.ogqList);
-      triggerAutoSave();
-    }
-
-    function removeOgqItem(idx) {
-      if (storeData.ogqList && storeData.ogqList.length > idx) {
-        storeData.ogqList.splice(idx, 1);
-        renderOgqList(storeData.ogqList);
-        triggerAutoSave();
-      }
-    }
-
-    function handleOgqImageUpload(e, idx) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 300; canvas.height = 300;
-            canvas.getContext('2d').drawImage(img, 0, 0, 300, 300);
-            const compressed = canvas.toDataURL('image/jpeg', 0.85);
-            if (!storeData.ogqList[idx]) storeData.ogqList[idx] = ["", ""];
-            storeData.ogqList[idx][0] = compressed;
-            renderOgqList(storeData.ogqList);
-            triggerAutoSave();
-          };
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function updateOgqFromDOM() {
-      const cards = document.querySelectorAll('.ogq-item-card');
-      const newList = [];
-      cards.forEach(card => {
-        const img = card.querySelector('.ogq-item-img');
-        const input = card.querySelector('.ogq-link-input');
-        const imgSrc = img ? (img.getAttribute('src') || img.src || '') : '';
-        const linkVal = input ? input.value.trim() : '#';
-        newList.push([imgSrc, linkVal]);
-      });
-      storeData.ogqList = newList;
-    }
-
-    function handleSigBalloonImageUpload(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 400; canvas.height = 405;
-            canvas.getContext('2d').drawImage(img, 0, 0, 400, 405);
-            const compressed = canvas.toDataURL('image/jpeg', 0.85);
-
-            const sigBalloonEl = document.getElementById('sig-balloon-img-element');
-            if (sigBalloonEl) {
-              sigBalloonEl.src = compressed;
-              sigBalloonEl.setAttribute('src', compressed);
-            }
-            storeData.sigBalloonImg = compressed;
-            triggerAutoSave();
-          };
-          img.src = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function populateRestoredData(overrideData = null) {
-      const targetData = overrideData || storeData;
-      const achList = document.getElementById('achievement-list');
-      const gameList = document.getElementById('game-list');
-      const tmiList = document.getElementById('tmi-list');
-
-      if (achList && targetData.achievements) {
-        achList.innerHTML = targetData.achievements.map((item, index) => `
-          <div class="item-row achievement-item" id="achieve-item-${index}">
-            <span class="anniv-date" contenteditable="false">${escapeHtml(item[0])}</span>
-            <span class="info-text" contenteditable="false">${escapeHtml(item[1])}</span>
-            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
-            <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>
-          </div>
-        `).join('');
-      }
-
-      if (gameList && targetData.games) {
-        gameList.innerHTML = targetData.games.map((item, index) => `
-          <div class="game-card-item" id="game-card-${index}">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-              <h3 contenteditable="false" class="game-title" style="font-size:1.05rem; color:var(--accent-color); font-weight:800; flex:1;">${escapeHtml(item[0])}</h3>
-              <select class="select-input game-rating-select" style="font-size:0.85rem;" onchange="this.querySelectorAll('option').forEach(o => o.removeAttribute('selected')); this.options[this.selectedIndex].setAttribute('selected', 'selected'); triggerAutoSave();">
-                <option value="⭐⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐⭐ (6점)</option>
-                <option value="⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐ (5점)</option>
-                <option value="⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐ (4점)</option>
-                <option value="⭐⭐⭐" ${item[1]==='⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐ (3점)</option>
-                <option value="⭐⭐" ${item[1]==='⭐⭐'?'selected="selected"':''}>⭐⭐ (2점)</option>
-                <option value="⭐" ${item[1]==='⭐'?'selected="selected"':''}>⭐ (1점)</option>
-                <option value="☆☆☆☆☆☆" ${item[1]==='☆☆☆☆☆☆'?'selected="selected"':''}>☆☆☆☆☆☆ (0점 / 빈칸)</option>
-                <option value="별점 없음" ${item[1]==='별점 없음'?'selected="selected"':''}>별점 없음</option>
-              </select>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color);">📅 플레이한 날짜:</span>
-              <span contenteditable="false" class="game-date-text" style="font-size:0.85rem; font-weight:700; color:var(--text-color);">${escapeHtml(item[2])}</span>
-            </div>
-            <div>
-              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color); display:block; margin-bottom:4px;">📝 후기:</span>
-              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border); white-space:pre-wrap;">${escapeHtml(item[3])}</div>
-            </div>
-            <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
-              <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-              <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
-              <button class="del-btn admin-only" onclick="this.closest('.game-card-item').remove(); updateAllPaginations(); triggerAutoSave();">삭제 ×</button>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      if (tmiList && targetData.tmi) {
-        tmiList.innerHTML = targetData.tmi.map((item, index) => `
-          <div class="item-row tmi-item" id="tmi-item-${index}" style="flex-direction:column; align-items:flex-start; gap:8px;">
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-              <span contenteditable="false" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706; box-shadow:none;">${escapeHtml(item[0])}</span>
-              <div style="display:flex; gap:4px; align-items:center;">
-                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
-                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
-                <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
-              </div>
-            </div>
-            <div contenteditable="false" class="tmi-content-text" style="font-size:0.9rem; color:var(--text-color); line-height:1.6; width:100%; white-space:pre-wrap;">${escapeHtml(item[1])}</div>
-          </div>
-        `).join('');
-      }
     }
 
     function loadFromLocalStorage() {
@@ -2200,7 +2027,6 @@
           const parsed = JSON.parse(localStore);
           if (parsed && typeof parsed === 'object') {
             storeData = parsed;
-            // 만약 이전 음악 관련 잔재가 남아있다면 안전하게 정리
             delete storeData.music;
             delete storeData.visitor_music_state;
           }
