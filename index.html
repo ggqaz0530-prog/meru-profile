@@ -1346,12 +1346,12 @@
         if (localStorage.getItem('is_dark_mode') === 'true') {
           document.body.classList.add('dark-mode');
           const btn = document.getElementById('dark-mode-toggle-btn');
-          if (btn) btn.textContent = '☀️ 라이트';
+          if (btn) btn.textContent = '☀️️ 라이트';
         }
       } catch(e) {}
     }
 
-    /* 💽 음악 재생 플레이어 상태 및 로직 (방문자별 개별 독립 재생 & 일시정지 이어서 재생 적용) */
+    /* 💽 음악 재생 플레이어 상태 및 로직 (일시정지 시 위치 유지 기능 적용) */
     let musicState = {
       cdImg: "",
       currentIndex: 0,
@@ -1368,7 +1368,7 @@
       const v = parseFloat(val);
       musicState.volume = v;
       if (audioEl) audioEl.volume = v;
-      saveMusicToLocal();
+      triggerAutoSave();
     }
 
     function togglePlaylistAccordion() {
@@ -1428,13 +1428,12 @@
       if (songs.length === 0) return;
 
       if (musicState.isPlaying) {
-        // 일시정지 시 현재 재생 중인 위치(currentTime)를 그대로 보존
+        // 일시정지 시 현재 재생 중인 위치(currentTime)를 그대로 유지한 채 정지
         audioEl.pause();
         musicState.isPlaying = false;
-        saveMusicToLocal();
       } else {
         const currentPath = songs[musicState.currentIndex][2] || '';
-        // 소스가 다를 때만 새로 로드
+        // 현재 소스와 오디오 태그의 소스가 다를 때만 새로 로드
         if (audioEl.src !== currentPath && currentPath) {
           audioEl.src = currentPath;
         }
@@ -1443,7 +1442,6 @@
         audioEl.play().then(() => {
           musicState.isPlaying = true;
           updateMusicPlayerUI();
-          saveMusicToLocal();
         }).catch(err => {
           alert('오디오 재생 실패: 깃허브에 파일이 정상적으로 업로드되었는지, 경로가 올바른지 확인해주세요.');
           musicState.isPlaying = false;
@@ -1461,10 +1459,9 @@
       if (musicState.currentIndex >= songs.length) musicState.currentIndex = 0;
 
       audioEl.pause();
-      audioEl.currentTime = 0; // 곡 변경 시 처음부터 시작
+      audioEl.currentTime = 0; // 곡 변경 시에는 처음부터 재생
       musicState.isPlaying = false;
       updateMusicPlayerUI();
-      saveMusicToLocal();
 
       if (songs.length > 0 && songs[musicState.currentIndex][2]) {
         audioEl.src = songs[musicState.currentIndex][2];
@@ -1472,7 +1469,6 @@
         audioEl.play().then(() => {
           musicState.isPlaying = true;
           updateMusicPlayerUI();
-          saveMusicToLocal();
         }).catch(e => {});
       }
     }
@@ -1505,30 +1501,6 @@
       musicState.cdImg = "";
       updateMusicPlayerUI();
       triggerAutoSave();
-    }
-
-    function saveMusicToLocal() {
-      try {
-        localStorage.setItem('visitor_music_state', JSON.stringify({
-          currentIndex: musicState.currentIndex,
-          volume: musicState.volume,
-          cdImg: musicState.cdImg
-        }));
-      } catch(e) {}
-    }
-
-    function loadMusicFromLocal() {
-      try {
-        const saved = localStorage.getItem('visitor_music_state');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed) {
-            if (parsed.currentIndex !== undefined) musicState.currentIndex = parsed.currentIndex;
-            if (parsed.volume !== undefined) musicState.volume = parsed.volume;
-            if (parsed.cdImg !== undefined) musicState.cdImg = parsed.cdImg;
-          }
-        }
-      } catch(e) {}
     }
 
     function renderPlaylistEditor() {
@@ -2316,6 +2288,8 @@
         const txt = item.querySelector('.tmi-content-text')?.textContent.trim() || '';
         if (tag || txt) storeData.tmi.push([tag, txt]);
       });
+
+      storeData.music = musicState;
     }
 
     function renderFromJSON(data) {
@@ -2336,6 +2310,12 @@
         if (pAccent) pAccent.value = data.theme.accent;
         if (pText) pText.value = data.theme.text;
         if (pTabText) pTabText.value = data.theme.tabText;
+      }
+
+      if (data.music) {
+        musicState = { ...musicState, ...data.music };
+        updateMusicPlayerUI();
+        renderPlaylistEditor();
       }
 
       const nameEl = document.getElementById('profile-name');
@@ -2396,7 +2376,7 @@
                   <span class="info-box-val" id="first-stream-text" contenteditable="false">${escapeHtml(val)}</span>
                 </div>
                 <button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button>
-                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️️</button>
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
                 <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
                 <button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>
               </div>`;
@@ -2488,6 +2468,1136 @@
       }
     }
 
+    function renderOgqList(ogqArr) {
+      const listEl = document.getElementById('ogq-grid-list');
+      if (!listEl) return;
+      const list = (ogqArr && ogqArr.length > 0) ? ogqArr : (storeData.ogqList || []);
+      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
+
+      listEl.innerHTML = list.map((item, idx) => {
+        const imgSrc = item[0] || 'https://via.placeholder.com/80';
+        const linkUrl = item[1] || '#';
+        return `
+          <div class="ogq-item-card" data-link="${escapeAttr(linkUrl)}" onclick="handleOgqClick(this, '${escapeAttr(linkUrl)}')">
+            <img src="${escapeAttr(imgSrc)}" class="ogq-item-img" alt="OGQ">
+            <div class="ogq-edit-overlay admin-only">
+              <input type="file" id="ogq-file-${idx}" accept="image/*" style="display:none;" onchange="handleOgqImageUpload(event, ${idx})">
+              <label for="ogq-file-${idx}" class="move-btn" style="cursor:pointer; font-size:0.6rem; padding:2px 4px;">🖼️ 이미지</label>
+              <input type="text" class="url-input ogq-link-input" value="${escapeAttr(linkUrl)}" placeholder="이동 링크 URL" oninput="updateOgqFromDOM(); triggerAutoSave();" style="font-size:0.6rem; padding:2px 4px; height:20px;">
+              <button class="del-btn" onclick="event.stopPropagation(); removeOgqItem(${idx})" style="font-size:0.7rem; color:#fff;">×</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleOgqClick(cardEl, url) {
+      if (document.body.classList.contains('admin-mode')) return;
+      if (url && url !== '#' && url.trim() !== '') {
+        window.open(url, '_blank');
+      }
+    }
+
+    function addOgqItem() {
+      if (!storeData.ogqList) storeData.ogqList = [];
+      storeData.ogqList.push(["https://via.placeholder.com/80", "https://"]);
+      renderOgqList(storeData.ogqList);
+      triggerAutoSave();
+    }
+
+    function removeOgqItem(idx) {
+      if (storeData.ogqList && storeData.ogqList.length > idx) {
+        storeData.ogqList.splice(idx, 1);
+        renderOgqList(storeData.ogqList);
+        triggerAutoSave();
+      }
+    }
+
+    function handleOgqImageUpload(e, idx) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300; canvas.height = 300;
+            canvas.getContext('2d').drawImage(img, 0, 0, 300, 300);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+            if (!storeData.ogqList[idx]) storeData.ogqList[idx] = ["", ""];
+            storeData.ogqList[idx][0] = compressed;
+            renderOgqList(storeData.ogqList);
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateOgqFromDOM() {
+      const cards = document.querySelectorAll('.ogq-item-card');
+      const newList = [];
+      cards.forEach(card => {
+        const img = card.querySelector('.ogq-item-img');
+        const input = card.querySelector('.ogq-link-input');
+        const imgSrc = img ? (img.getAttribute('src') || img.src || '') : '';
+        const linkVal = input ? input.value.trim() : '#';
+        newList.push([imgSrc, linkVal]);
+      });
+      storeData.ogqList = newList;
+    }
+
+    function handleSigBalloonImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 400; canvas.height = 405; /* 2047:2076 비율 유지 최적화 */
+            canvas.getContext('2d').drawImage(img, 0, 0, 400, 405);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+            const sigBalloonEl = document.getElementById('sig-balloon-img-element');
+            if (sigBalloonEl) {
+              sigBalloonEl.src = compressed;
+              sigBalloonEl.setAttribute('src', compressed);
+            }
+            storeData.sigBalloonImg = compressed;
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function populateRestoredData(overrideData = null) {
+      const targetData = overrideData || storeData;
+      const achList = document.getElementById('achievement-list');
+      const gameList = document.getElementById('game-list');
+      const tmiList = document.getElementById('tmi-list');
+
+      if (achList && targetData.achievements) {
+        achList.innerHTML = targetData.achievements.map((item, index) => `
+          <div class="item-row achievement-item" id="achieve-item-${index}">
+            <span class="anniv-date" contenteditable="false">${escapeHtml(item[0])}</span>
+            <span class="info-text" contenteditable="false">${escapeHtml(item[1])}</span>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
+            <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+          </div>
+        `).join('');
+      }
+
+      if (gameList && targetData.games) {
+        gameList.innerHTML = targetData.games.map((item, index) => `
+          <div class="game-card-item" id="game-card-${index}">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <h3 contenteditable="false" class="game-title" style="font-size:1.05rem; color:var(--accent-color); font-weight:800; flex:1;">${escapeHtml(item[0])}</h3>
+              <select class="select-input game-rating-select" style="font-size:0.85rem;" onchange="this.querySelectorAll('option').forEach(o => o.removeAttribute('selected')); this.options[this.selectedIndex].setAttribute('selected', 'selected'); triggerAutoSave();">
+                <option value="⭐⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐⭐ (6점)</option>
+                <option value="⭐⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐⭐ (5점)</option>
+                <option value="⭐⭐⭐⭐" ${item[1]==='⭐⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐⭐ (4점)</option>
+                <option value="⭐⭐⭐" ${item[1]==='⭐⭐⭐'?'selected="selected"':''}>⭐⭐⭐ (3점)</option>
+                <option value="⭐⭐" ${item[1]==='⭐⭐'?'selected="selected"':''}>⭐⭐ (2점)</option>
+                <option value="⭐" ${item[1]==='⭐'?'selected="selected"':''}>⭐ (1점)</option>
+                <option value="☆☆☆☆☆☆" ${item[1]==='☆☆☆☆☆☆'?'selected="selected"':''}>☆☆☆☆☆☆ (0점 / 빈칸)</option>
+                <option value="별점 없음" ${item[1]==='별점 없음'?'selected="selected"':''}>별점 없음</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color);">📅 플레이한 날짜:</span>
+              <span contenteditable="false" class="game-date-text" style="font-size:0.85rem; font-weight:700; color:var(--text-color);">${escapeHtml(item[2])}</span>
+            </div>
+            <div>
+              <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color); display:block; margin-bottom:4px;">📝 후기:</span>
+              <div contenteditable="false" class="game-review-text" style="font-size:0.88rem; color:var(--text-color); line-height:1.5; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border); white-space:pre-wrap;">${escapeHtml(item[3])}</div>
+            </div>
+            <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
+              <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+              <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+              <button class="del-btn admin-only" onclick="this.closest('.game-card-item').remove(); updateAllPaginations(); triggerAutoSave();">삭제 ×</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (tmiList && targetData.tmi) {
+        tmiList.innerHTML = targetData.tmi.map((item, index) => `
+          <div class="item-row tmi-item" id="tmi-item-${index}" style="flex-direction:column; align-items:flex-start; gap:8px;">
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+              <span contenteditable="false" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706; box-shadow:none;">${escapeHtml(item[0])}</span>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+                <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
+                <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+              </div>
+            </div>
+            <div contenteditable="false" class="tmi-content-text" style="font-size:0.9rem; color:var(--text-color); line-height:1.6; width:100%; white-space:pre-wrap;">${escapeHtml(item[1])}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 832; canvas.height = 1216;
+            canvas.getContext('2d').drawImage(img, 0, 0, 832, 1216);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+            const profileImgEl = document.getElementById('profile-img-element');
+            if (profileImgEl) {
+              profileImgEl.src = compressed;
+              profileImgEl.setAttribute('src', compressed);
+            }
+
+            if (!storeData.profile) storeData.profile = {};
+            storeData.profile.img = compressed;
+            ImageStore.saveImage('profile_img', compressed);
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleBannerImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1216; canvas.height = 832;
+            canvas.getContext('2d').drawImage(img, 0, 0, 1216, 832);
+            const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+            const bannerEl = document.getElementById('home-banner-img-element');
+            if (bannerEl) {
+              bannerEl.src = compressed;
+              bannerEl.setAttribute('src', compressed);
+            }
+            storeData.homeBanner = compressed;
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleFanCharImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 150; canvas.height = 150;
+            canvas.getContext('2d').drawImage(img, 0, 0, 150, 150);
+            const compressed = canvas.toDataURL('image/jpeg', 0.8);
+
+            const fanCharImgEl = document.getElementById('fan-char-img-element');
+            if (fanCharImgEl) {
+              fanCharImgEl.src = compressed;
+              fanCharImgEl.setAttribute('src', compressed);
+            }
+            if (!storeData.fanChar) storeData.fanChar = {};
+            storeData.fanChar.img = compressed;
+            triggerAutoSave();
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleAuthClick() {
+      if (getAdminState() || document.body.classList.contains('admin-mode')) {
+        if (confirm('로그아웃 하시겠습니까?')) {
+          setAdminState(false);
+          exitAdminMode();
+          location.reload();
+        }
+      } else {
+        openModal('login-modal');
+        const pwInput = document.getElementById('pw-input');
+        if (pwInput) { pwInput.value = ''; setTimeout(() => pwInput.focus(), 100); }
+      }
+    }
+
+    function verifyPassword() {
+      const pwInput = document.getElementById('pw-input');
+      if (pwInput && pwInput.value.trim() === getAdminPassword()) {
+        setAdminState(true);
+        enterAdminMode();
+        closeModal('login-modal');
+      } else {
+        const errEl = document.getElementById('error-msg');
+        if (errEl) errEl.style.display = 'block';
+      }
+    }
+
+    function openChangePwModal() {
+      openModal('change-pw-modal');
+      document.getElementById('new-pw-input').value = '';
+      document.getElementById('new-pw-confirm').value = '';
+      document.getElementById('change-pw-error').style.display = 'none';
+    }
+
+    function changePassword() {
+      const p1 = document.getElementById('new-pw-input').value.trim(); 
+      const p2 = document.getElementById('new-pw-confirm').value.trim();
+      if (p1 && p1 === p2) {
+        try { localStorage.setItem('admin_pw', p1); } catch(e) {}
+        cloudAdminPw = p1;
+        if (isFirebaseActive && db) db.ref('live_profile_json_v3/admin_pw').set(p1);
+        savePage(true);
+        alert('🔑 비밀번호가 전체 기기(PC/모바일)에 일괄 동기화되었습니다!');
+        closeModal('change-pw-modal');
+      } else {
+        const errEl = document.getElementById('change-pw-error');
+        if (errEl) errEl.style.display = 'block';
+      }
+    }
+
+    function enterAdminMode() {
+      document.body.classList.add('admin-mode'); 
+      const authBtn = document.getElementById('auth-btn');
+      if (authBtn) authBtn.textContent = "🔓 로그아웃"; 
+      const statusText = document.getElementById('status-text');
+      if (statusText) statusText.textContent = "관리자 모드 (🟢 실시간 저장 완료)";
+      setEditable(true);
+      renderCalendar();
+      renderPlaylistEditor();
+      renderOgqList(storeData.ogqList);
+    }
+
+    function exitAdminMode() {
+      document.body.classList.remove('admin-mode'); 
+      const authBtn = document.getElementById('auth-btn');
+      if (authBtn) authBtn.textContent = "🔒 관리자 로그인"; 
+      const statusText = document.getElementById('status-text');
+      if (statusText) statusText.textContent = "일반 모드";
+      setEditable(false);
+      applyLinkData();
+      refreshAllDDay();
+      renderCalendar();
+      renderPlaylistEditor();
+      renderOgqList(storeData.ogqList);
+    }
+
+    function setEditable(val) {
+      const editableSelectors = ['#profile-name', '#profile-bio', '#game-bio', '#fan-char-desc', '.info-box-label', '.info-box-val', '.link-name-edit', '.anniv-title', '.mc-tag-text', '.achievement-item .anniv-date', '.achievement-item .info-text', '.game-title', '.game-date-text', '.game-review-text', '.tmi-tag', '.tmi-content-text', '.cal-event-time', '.cal-event-text'];
+      document.querySelectorAll(editableSelectors.join(', ')).forEach(el => { el.setAttribute('contenteditable', val ? "true" : "false"); });
+      document.querySelectorAll('.game-rating-select').forEach(sel => { sel.disabled = !val; });
+    }
+
+    function switchTab(btnEl, tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      if (btnEl && btnEl.classList) {
+        btnEl.classList.add('active');
+      } else {
+        const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick')?.includes(`'${tabId}'`));
+        if (targetBtn) targetBtn.classList.add('active');
+      }
+
+      const targetTab = document.getElementById('tab-' + tabId);
+      if (targetTab) targetTab.classList.add('active');
+        
+      if (tabId === 'monthly') {
+        setTimeout(renderCalendar, 20);
+      }
+      if (tabId === 'home') {
+        updateMusicPlayerUI();
+      }
+    }
+
+    function openDayEventsModal(dateKey) {
+      const dateEl = document.getElementById('evt-detail-date');
+      const timeEl = document.getElementById('evt-detail-time');
+      const contentEl = document.getElementById('evt-detail-content');
+
+      if (dateKey) {
+        const parts = formatYMD(dateKey).split('-');
+        dateEl.textContent = parts.length === 3 ? `📅 ${parts[0]}년 ${parts[1]}월 ${parts[2]}일 일정` : `📅 ${dateKey} 일정`;
+      } else { 
+        dateEl.textContent = `📅 일정 상세보기`; 
+      }
+
+      if (timeEl) timeEl.style.display = 'none';
+
+      const evts = calendarEvents[dateKey] || [];
+      if (evts.length === 0) {
+        contentEl.innerHTML = '<div style="text-align:center; color:#8c6b73; padding:16px 0; font-weight:700;">등록된 일정이 없습니다.</div>';
+      } else {
+        contentEl.innerHTML = evts.map((evt, idx) => `
+          <style>
+            .cal-event-detail-item {
+              background: var(--card-bg);
+              border: 1.5px solid var(--item-border);
+              border-radius: 12px;
+              padding: 10px 12px;
+              margin-bottom: 8px;
+              box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+              text-align: left;
+            }
+          </style>
+          <div class="cal-event-detail-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.75rem; font-weight:800; color:var(--accent-color); background:var(--item-bg); padding:2px 8px; border-radius:6px;">
+                ${evt.time && evt.time.trim() ? '⏰ ' + escapeHtml(evt.time.trim()) : '📌 하루 종일'}
+              </span>
+              <span style="font-size:0.75rem; color:var(--tab-text-color); font-weight:800;">#${idx + 1}</span>
+            </div>
+            <div style="font-size:0.92rem; font-weight:700; color:var(--text-color); white-space:pre-wrap; word-break:break-all; line-height:1.4;">
+              ${escapeHtml(evt.text || '내용 없음')}
+            </div>
+          </div>
+        `).join('');
+      }
+      openModal('event-detail-modal');
+    }
+
+    function renderPaginatedList(listId, paginationId, pageKey) {
+      const listEl = document.getElementById(listId);
+      if (!listEl) return;
+
+      let paginationEl = document.getElementById(paginationId);
+      if (!paginationEl) {
+        paginationEl = document.createElement('div');
+        paginationEl.className = 'pagination-bar';
+        paginationEl.id = paginationId;
+        if (listEl.parentElement) listEl.parentElement.appendChild(paginationEl);
+      }
+
+      const items = Array.from(listEl.children).filter(child => child.nodeType === 1 && !child.classList.contains('pagination-bar'));
+      const totalItems = items.length;
+      const itemsPerPage = pageLimit[pageKey] || 30;
+      const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+      if (pageState[pageKey] > totalPages) pageState[pageKey] = totalPages;
+      if (pageState[pageKey] < 1) pageState[pageKey] = 1;
+
+      const currentPage = pageState[pageKey];
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+
+      items.forEach((item, index) => {
+        item.style.display = (index >= startIndex && index < endIndex) ? 'flex' : 'none';
+      });
+
+      paginationEl.innerHTML = '';
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'page-btn'; prevBtn.textContent = '◀'; prevBtn.disabled = (currentPage === 1);
+      prevBtn.onclick = function() { if (pageState[pageKey] > 1) { pageState[pageKey]--; renderPaginatedList(listId, paginationId, pageKey); } };
+      paginationEl.appendChild(prevBtn);
+
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+        btn.textContent = i;
+        btn.onclick = function() { pageState[pageKey] = i; renderPaginatedList(listId, paginationId, pageKey); };
+        paginationEl.appendChild(btn);
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'page-btn'; nextBtn.textContent = '▶'; nextBtn.disabled = (currentPage === totalPages);
+      nextBtn.onclick = function() { if (pageState[pageKey] < totalPages) { pageState[pageKey]++; renderPaginatedList(listId, paginationId, pageKey); } };
+      paginationEl.appendChild(nextBtn);
+
+      const limitSelect = document.createElement('select');
+      limitSelect.className = 'select-input';
+      limitSelect.style.cssText = 'font-size:0.75rem; padding:3px 6px; margin-left:6px;';
+      [10, 30, 50].forEach(num => {
+        const opt = document.createElement('option');
+        opt.value = num; opt.textContent = `${num}개씩 보기`;
+        if (num === itemsPerPage) opt.selected = true;
+        limitSelect.appendChild(opt);
+      });
+      limitSelect.onchange = function() {
+        pageLimit[pageKey] = parseInt(this.value, 10);
+        pageState[pageKey] = 1;
+        renderPaginatedList(listId, paginationId, pageKey);
+      };
+      paginationEl.appendChild(limitSelect);
+
+      const infoSpan = document.createElement('span');
+      infoSpan.style.cssText = 'font-size: 0.8rem; font-weight: 700; color: var(--accent-color); margin-left: 6px;';
+      infoSpan.textContent = `(${currentPage} / ${totalPages} 페이지, 총 ${totalItems}개)`;
+      paginationEl.appendChild(infoSpan);
+    }
+
+    function updateAllPaginations() {
+      renderPaginatedList('achievement-list', 'pagination-achievements', 'achievements');
+      renderPaginatedList('game-list', 'pagination-games', 'games');
+      renderPaginatedList('tmi-list', 'pagination-tmi', 'tmi');
+    }
+
+    function adjustPaginationAfterMove(parent, movedRow) {
+      const listId = parent ? parent.id : '';
+      let pageKey = '';
+      if (listId === 'achievement-list') pageKey = 'achievements';
+      else if (listId === 'game-list') pageKey = 'games';
+      else if (listId === 'tmi-list') pageKey = 'tmi';
+
+      if (pageKey) {
+        const items = Array.from(parent.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+        const movedIndex = items.indexOf(movedRow);
+        if (movedIndex !== -1) {
+          const itemsPerPage = pageLimit[pageKey] || 30;
+          const targetPage = Math.floor(movedIndex / itemsPerPage) + 1;
+          pageState[pageKey] = targetPage;
+        }
+      }
+    }
+
+    function moveRowUp(btn) {
+      const row = btn.closest('.info-box-item, .link-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
+      if (row && row.previousElementSibling) {
+        const parent = row.parentElement;
+        parent.insertBefore(row, row.previousElementSibling);
+        adjustPaginationAfterMove(parent, row);
+        updateAllPaginations();
+        triggerAutoSave();
+      }
+    }
+
+    function moveRowDown(btn) {
+      const row = btn.closest('.info-box-item, .link-item, .anniv-item, .mc-tag-item, .achievement-item, .game-card-item, .tmi-item');
+      if (row && row.nextElementSibling) {
+        const parent = row.parentElement;
+        parent.insertBefore(row.nextElementSibling, row);
+        adjustPaginationAfterMove(parent, row);
+        updateAllPaginations();
+        triggerAutoSave();
+      }
+    }
+
+    function toggleBoxWidth(btn) {
+      const box = btn.parentElement;
+      if (box) { box.classList.toggle('full-width'); triggerAutoSave(); }
+    }
+
+    function handleGlobalSearch(query) {
+      const dropdown = document.getElementById('search-results-dropdown');
+      const clearBtn = document.getElementById('search-clear-btn');
+      const keyword = query.trim().toLowerCase();
+      if (!keyword) { dropdown.style.display = 'none'; clearBtn.style.display = 'none'; return; }
+      clearBtn.style.display = 'inline-block'; dropdown.innerHTML = '';
+
+      const targets = [
+        { id: 'tab-home', tabName: 'home', badge: '🏠 홈' },
+        { id: 'tab-profile', tabName: 'profile', badge: '🎀 프로필' },
+        { id: 'tab-achievements', tabName: 'achievements', badge: '🏆 방송 업적' },
+        { id: 'tab-games', tabName: 'games', badge: '🎮 플레이 게임' },
+        { id: 'tab-tmi', tabName: 'tmi', badge: '💬 TMI & 여담' }
+      ];
+
+      const results = [];
+      targets.forEach(target => {
+        const tabEl = document.getElementById(target.id);
+        if (!tabEl) return;
+        const items = tabEl.querySelectorAll('.info-box-item, .item-row, .game-card-item, .fan-character-box');
+        items.forEach((item, idx) => {
+          const clone = item.cloneNode(true);
+          clone.querySelectorAll('.admin-only, button, select, input').forEach(el => el.remove());
+          const txt = clone.textContent.replace(/\s+/g, ' ').trim();
+
+          if (txt && txt.toLowerCase().includes(keyword)) {
+            let clean = txt;
+            if (clean.length > 45) clean = clean.substring(0, 45) + '...';
+            if (!item.id) item.id = `search-target-${target.tabName}-${idx}`;
+            results.push({ text: clean, tabName: target.tabName, badge: target.badge, elementId: item.id });
+          }
+        });
+      });
+
+      if (calendarEvents && typeof calendarEvents === 'object') {
+        for (const [dateKey, evts] of Object.entries(calendarEvents)) {
+          if (Array.isArray(evts)) {
+            evts.forEach(evt => {
+              const timeText = evt.time ? evt.time.trim() : '';
+              const descText = evt.text ? evt.text.trim() : '';
+              const fullStr = `${dateKey} ${timeText} ${descText}`;
+              if (fullStr.toLowerCase().includes(keyword)) {
+                let clean = `[${dateKey}] ${timeText ? timeText + ' ' : ''}${descText}`.trim();
+                if (clean.length > 45) clean = clean.substring(0, 45) + '...';
+                results.push({
+                  text: clean,
+                  tabName: 'monthly',
+                  badge: '📅 월간 일정',
+                  dateKey: dateKey
+                });
+              }
+            });
+          }
+        }
+      }
+
+      if (results.length === 0) {
+        dropdown.innerHTML = '<div style="padding:12px; font-size:0.85rem; font-weight:700; text-align:center;">🔍 검색 결과가 없습니다.</div>';
+      } else {
+        results.slice(0, 15).forEach(res => {
+          const div = document.createElement('div');
+          div.className = 'search-result-item';
+          div.innerHTML = `<span class="search-result-text">${escapeHtml(res.text)}</span><span class="search-result-badge">${res.badge}</span>`;
+          div.onclick = function() { 
+            if (res.tabName === 'monthly') {
+              jumpToCalendarDate(res.dateKey);
+            } else {
+              jumpToSearchResult(res.tabName, res.elementId); 
+            }
+          };
+          dropdown.appendChild(div);
+        });
+      }
+      dropdown.style.display = 'flex';
+    }
+
+    function jumpToCalendarDate(dateKey) {
+      const dropdown = document.getElementById('search-results-dropdown');
+      if (dropdown) dropdown.style.display = 'none';
+
+      const parts = dateKey.split('-');
+      if (parts.length === 3) {
+        currentYear = parseInt(parts[0], 10);
+        currentMonth = parseInt(parts[1], 10) - 1;
+      }
+      switchTab(null, 'monthly');
+      renderCalendar();
+
+      setTimeout(() => {
+        const targetCell = document.getElementById(`cal-cell-${dateKey}`);
+        if (targetCell) {
+          targetCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetCell.classList.add('search-highlight');
+          setTimeout(() => targetCell.classList.remove('search-highlight'), 2400);
+        }
+        openDayEventsModal(dateKey);
+      }, 150);
+    }
+
+    function jumpToSearchResult(tabName, elementId) {
+      document.getElementById('search-results-dropdown').style.display = 'none';
+      switchTab(null, tabName);
+
+      setTimeout(() => {
+        let targetEl = document.getElementById(elementId);
+        const parent = targetEl?.parentElement || document.querySelector(`#tab-${tabName} .list-wrapper`);
+
+        if (parent) {
+          let pageKey = '';
+          if (parent.id === 'achievement-list') pageKey = 'achievements';
+          else if (parent.id === 'game-list') pageKey = 'games';
+          else if (parent.id === 'tmi-list') pageKey = 'tmi';
+
+          if (pageKey) {
+            const items = Array.from(parent.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+            if (!targetEl && items.length > 0) targetEl = items[0];
+            const idx = items.indexOf(targetEl);
+            if (idx !== -1) {
+              const itemsPerPage = pageLimit[pageKey] || 30;
+              pageState[pageKey] = Math.floor(idx / itemsPerPage) + 1;
+              renderPaginatedList(parent.id, 'pagination-' + pageKey, pageKey);
+            }
+          }
+        }
+
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetEl.classList.add('search-highlight');
+          setTimeout(() => targetEl.classList.remove('search-highlight'), 2400);
+        }
+      }, 150);
+    }
+
+    function clearGlobalSearch() {
+      const input = document.getElementById('global-search-input');
+      input.value = ''; handleGlobalSearch(''); input.focus();
+    }
+
+    function triggerAutoSave() {
+      if (!document.body.classList.contains('admin-mode')) return;
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => { savePage(true); }, 800);
+    }
+
+    document.addEventListener('input', function(e) {
+      if (document.body.classList.contains('admin-mode') && e.target.isContentEditable) {
+        triggerAutoSave();
+      }
+    });
+
+    function updateAnnivDate(inputEl) {
+      const parent = inputEl.closest('.anniv-item');
+      if (!parent) return;
+      const selectedDate = inputEl.value;
+      if (!selectedDate) return;
+      inputEl.setAttribute('value', selectedDate);
+      parent.setAttribute('data-date', selectedDate);
+      const parts = formatYMD(selectedDate).split('-');
+      if (parts.length === 3) parent.querySelector('.anniv-date').textContent = `${String(parts[1]).padStart(2, '0')}.${String(parts[2]).padStart(2, '0')}`;
+      parent.querySelector('.dday-badge').textContent = calculateDDay(selectedDate);
+      triggerAutoSave();
+    }
+
+    function refreshAllDDay() {
+      document.querySelectorAll('.anniv-item').forEach(item => {
+        const dateStr = item.getAttribute('data-date');
+        if (dateStr) item.querySelector('.dday-badge').textContent = calculateDDay(dateStr);
+      });
+    }
+
+    function updateStreamDays(skipAutoSave = false) {
+      const datePicker = document.getElementById('first-stream-picker');
+      const displayBadge = document.getElementById('stream-days-display');
+      const textDisplay = document.getElementById('first-stream-text');
+      if (!datePicker) return;
+      const startDateStr = datePicker.value || (textDisplay ? textDisplay.textContent : '');
+      if (!startDateStr) return;
+      datePicker.setAttribute('value', startDateStr);
+      const parts = formatYMD(startDateStr).split('-');
+      if (parts.length === 3 && textDisplay) textDisplay.textContent = `${parts[0]}.${parts[1]}.${parts[2]}`;
+
+      if (displayBadge) {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const start = parseLocalDate(startDateStr); start.setHours(0, 0, 0, 0);
+        const diffTime = today.getTime() - start.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0) displayBadge.textContent = `${diffDays + 1}일차 🎉`;
+        else displayBadge.textContent = `D-${Math.abs(diffDays)}`;
+      }
+      if (!skipAutoSave) triggerAutoSave();
+    }
+
+    function renderCalendar() {
+      const calTitle = document.getElementById('calendar-title');
+      if (calTitle) calTitle.textContent = `${currentYear}년 ${currentMonth + 1}월`;
+      const calBody = document.getElementById('calendar-body'); 
+      if (!calBody) return; calBody.innerHTML = '';
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('div'); emptyCell.className = 'cal-cell empty-cell'; calBody.appendChild(emptyCell);
+      }
+      const isAdmin = getAdminState() || document.body.classList.contains('admin-mode');
+      for (let date = 1; date <= lastDate; date++) {
+        const cell = document.createElement('div'); 
+        cell.className = 'cal-cell';
+        const dateKey = `${currentYear}-${currentMonth + 1}-${date}`;
+        cell.id = `cal-cell-${dateKey}`;
+            
+        cell.onclick = function(e) {
+          if (!document.body.classList.contains('admin-mode') && !e.target.closest('.cal-add-evt-btn') && !e.target.closest('.cal-event-del')) {
+            openDayEventsModal(dateKey);
+          }
+        };
+
+        const cellHeader = document.createElement('div'); cellHeader.className = 'cal-cell-header';
+            
+        const numWrap = document.createElement('div');
+        numWrap.style.cssText = 'display:flex; align-items:center; gap:4px;';
+        const num = document.createElement('span'); num.className = 'cal-num'; num.textContent = date;
+        numWrap.appendChild(num);
+
+        let events = calendarEvents[dateKey] || [];
+        if (events.length >= 3) {
+          const countBadge = document.createElement('span');
+          countBadge.style.cssText = 'font-size:0.58rem; font-weight:800; color:var(--accent-color); background:var(--item-bg); padding:1px 4px; border-radius:6px; line-height:1; border:1px solid var(--item-border);';
+          countBadge.textContent = `${events.length}`;
+          numWrap.appendChild(countBadge);
+        }
+        cellHeader.appendChild(numWrap);
+
+        if (isAdmin) {
+          const addEvtBtn = document.createElement('button'); addEvtBtn.className = 'cal-add-evt-btn'; addEvtBtn.textContent = '+';
+          addEvtBtn.onclick = function(e) { 
+            e.stopPropagation(); 
+            addCalendarEventItem(dateKey, '', ''); 
+          };
+          cellHeader.appendChild(addEvtBtn);
+        }
+        cell.appendChild(cellHeader);
+
+        const evtList = document.createElement('div'); evtList.className = 'cal-event-list'; evtList.id = `cal-evt-list-${dateKey}`;
+        events.forEach(evtObj => renderEventItem(evtList, dateKey, evtObj.time || '', evtObj.text || '', isAdmin));
+        cell.appendChild(evtList); 
+        calBody.appendChild(cell);
+      }
+    }
+
+    function renderEventItem(container, dateKey, time, text, isAdmin) {
+      const item = document.createElement('div'); 
+      item.className = 'cal-event-item';
+      item.style.cursor = 'pointer';
+      item.onclick = function(e) {
+        if (!document.body.classList.contains('admin-mode')) {
+          e.stopPropagation();
+          openDayEventsModal(dateKey);
+        }
+      };
+
+      const topRow = document.createElement('div'); topRow.className = 'cal-event-top';
+      const timeSpan = document.createElement('span'); timeSpan.className = 'cal-event-time'; timeSpan.textContent = time;
+      timeSpan.contentEditable = isAdmin ? "true" : "false";
+      timeSpan.oninput = function() { saveCalendarEventsFromDOM(); triggerAutoSave(); };
+      topRow.appendChild(timeSpan);
+
+      if (isAdmin) {
+        const delBtn = document.createElement('button'); delBtn.className = 'cal-event-del'; delBtn.innerHTML = '×';
+        delBtn.onclick = function(e) { e.stopPropagation(); item.remove(); saveCalendarEventsFromDOM(); triggerAutoSave(); };
+        topRow.appendChild(delBtn);
+      }
+      item.appendChild(topRow);
+
+      const textSpan = document.createElement('span'); 
+      textSpan.className = 'cal-event-text'; 
+      textSpan.textContent = text || '새 일정';
+      textSpan.contentEditable = isAdmin ? "true" : "false";
+      textSpan.oninput = function() { saveCalendarEventsFromDOM(); triggerAutoSave(); };
+      item.appendChild(textSpan);
+
+      container.appendChild(item);
+    }
+
+    function addCalendarEventItem(dateKey, time, text) {
+      let eventText = text || prompt('일정 내용을 입력하세요:', '새 일정');
+      if (eventText === null) return;
+      if (!calendarEvents[dateKey]) calendarEvents[dateKey] = [];
+      calendarEvents[dateKey].push({ time: time || '', text: eventText.trim() || '새 일정' });
+      renderCalendar(); 
+      triggerAutoSave();
+    }
+
+    function saveCalendarEventsFromDOM() {
+      const cells = document.querySelectorAll('.cal-cell:not(.empty-cell)');
+      cells.forEach(cell => {
+        const listContainer = cell.querySelector('.cal-event-list');
+        if (listContainer) {
+          const dateKey = listContainer.id.replace('cal-evt-list-', '');
+          const items = listContainer.querySelectorAll('.cal-event-item');
+          const arr = [];
+          items.forEach(item => {
+            const timeVal = item.querySelector('.cal-event-time')?.textContent.trim() || '';
+            const textVal = item.querySelector('.cal-event-text')?.textContent.trim() || '';
+            if (timeVal || textVal) arr.push({ time: timeVal, text: textVal });
+          });
+          if (arr.length > 0) calendarEvents[dateKey] = arr;
+          else delete calendarEvents[dateKey];
+        }
+      });
+    }
+
+    function moveMonth(delta) {
+      saveCalendarEventsFromDOM(); 
+      currentMonth += delta;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      renderCalendar();
+      triggerAutoSave();
+    }
+
+    function manualSavePage() { savePage(false); }
+
+    function savePage(isSilent = false) {
+      if (autoSaveTimer) { clearTimeout(autoSaveTimer); autoSaveTimer = null; }
+      const statusEl = document.getElementById('status-text');
+      if (statusEl && document.body.classList.contains('admin-mode')) statusEl.textContent = "관리자 모드 (🟡 서버 전송 중...)";
+
+      try {
+        extractStoreDataFromDOM();
+        saveCalendarEventsFromDOM();
+
+        const nowTimestamp = Date.now();
+        const currentPw = getAdminPassword();
+        try {
+          localStorage.setItem('last_updated_at', nowTimestamp.toString());
+          localStorage.setItem('applied_cloud_version', nowTimestamp.toString());
+          localStorage.setItem('local_store_data', JSON.stringify(storeData));
+          localStorage.setItem('local_cal_events', JSON.stringify(calendarEvents));
+        } catch(e) {}
+
+        if (isFirebaseActive && db) {
+          isFirebaseSaving = true;
+          db.ref('live_profile_json_v3').set({
+            storeData: storeData,
+            cal_events: JSON.stringify(calendarEvents),
+            admin_pw: currentPw,
+            updated_at: nowTimestamp
+          }).then(() => {
+            isFirebaseSaving = false;
+            if (statusEl && document.body.classList.contains('admin-mode')) statusEl.textContent = "관리자 모드 (🟢 실시간 저장 완료)";
+          }).catch(e => { isFirebaseSaving = false; });
+        }
+
+        if (!isSilent) {
+          alert('✨ 수정한 내용이 실시간으로 적용/저장되었습니다!');
+          if (getAdminState()) enterAdminMode();
+          else exitAdminMode();
+        }
+      } catch (err) {
+        if (!isSilent) alert('⚠️ 저장 처리 중 오류 발생: ' + err.message);
+      }
+    }
+
+    function addProfileInfoItem() {
+      const grid = document.querySelector('.profile-info-grid'); if (!grid) return;
+      const div = document.createElement('div'); div.className = 'info-box-item';
+      div.innerHTML = `<span class="info-box-label" contenteditable="true">새 항목명</span><span class="info-box-val" contenteditable="true">내용 입력</span><button class="resize-btn admin-only" onclick="toggleBoxWidth(this)">↔️</button><button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button><button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
+      grid.appendChild(div); setEditable(true); triggerAutoSave();
+    }
+
+    function addMcServerItem() {
+      const list = document.getElementById('mc-server-list');
+      const div = document.createElement('div'); div.className = 'mc-tag-item';
+      div.innerHTML = `<span contenteditable="true" class="mc-tag-text">서버 이름</span><button class="move-btn admin-only" onclick="moveRowUp(this)">⬅️</button><button class="move-btn admin-only" onclick="moveRowDown(this)">➡️</button><button class="del-btn admin-only" onclick="this.parentElement.remove(); triggerAutoSave();">×</button>`;
+      list.appendChild(div); setEditable(true); triggerAutoSave();
+    }
+
+    function addAchievementItem() {
+      const list = document.getElementById('achievement-list');
+      if (!list) return;
+      const today = new Date();
+      const todayYmd8 = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = 'item-row achievement-item';
+      div.innerHTML = `
+        <span class="anniv-date" contenteditable="true">${todayYmd8}</span>
+        <span class="info-text" contenteditable="true">달성했던 방송 업적 및 기록 기재</span>
+        <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button>
+        <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+        <button class="del-btn admin-only" onclick="this.parentElement.remove(); updateAllPaginations(); triggerAutoSave();">×</button>`;
+      list.appendChild(div);
+      setEditable(true);
+      updateAllPaginations();
+
+      const itemsPerPage = pageLimit['achievements'] || 30;
+      const items = Array.from(list.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+      pageState['achievements'] = Math.ceil(items.length / itemsPerPage) || 1;
+      renderPaginatedList('achievement-list', 'pagination-achievements', 'achievements');
+
+      triggerAutoSave();
+    }
+
+    function addGameItem() {
+      const list = document.getElementById('game-list');
+      if (!list) return;
+      const today = new Date();
+      const todayFormatted = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = 'game-card-item';
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <h3 contenteditable="true" class="game-title" style="font-size:1.05rem; color:var(--accent-color); font-weight:800; flex:1;">새 게임 제목</h3>
+          <select class="select-input game-rating-select" style="font-size:0.85rem;" onchange="this.querySelectorAll('option').forEach(o => o.removeAttribute('selected')); this.options[this.selectedIndex].setAttribute('selected', 'selected'); triggerAutoSave();">
+            <option value="⭐⭐⭐⭐⭐⭐" selected="selected">⭐⭐⭐⭐⭐⭐ (6점)</option>
+            <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐ (5점)</option>
+            <option value="⭐⭐⭐⭐">⭐⭐⭐⭐ (4점)</option>
+            <option value="⭐⭐⭐">⭐⭐⭐ (3점)</option>
+            <option value="⭐⭐">⭐⭐ (2점)</option>
+            <option value="⭐">⭐ (1점)</option>
+            <option value="☆☆☆☆☆☆">☆☆☆☆☆☆ (0점 / 빈칸)</option>
+            <option value="별점 없음">별점 없음</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; color:var(--accent-color);">📅 날짜:</span>
+          <span contenteditable="true" class="game-date-text" style="font-size:0.85rem; font-weight:700;">${todayFormatted}</span>
+        </div>
+        <div>
+          <div contenteditable="true" class="game-review-text" style="font-size:0.88rem; background:var(--card-bg); padding:10px; border-radius:12px; border:1.5px solid var(--item-border);">게임 후기를 작성하세요.</div>
+        </div>
+        <div style="display:flex; gap:6px; align-self:flex-end; align-items:center;">
+          <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+          <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇️</button>
+          <button class="del-btn admin-only" onclick="this.closest('.game-card-item').remove(); updateAllPaginations(); triggerAutoSave();">삭제 ×</button>
+        </div>`;
+      list.appendChild(div);
+      setEditable(true);
+      updateAllPaginations();
+
+      const itemsPerPage = pageLimit['games'] || 30;
+      const items = Array.from(list.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+      pageState['games'] = Math.ceil(items.length / itemsPerPage) || 1;
+      renderPaginatedList('game-list', 'pagination-games', 'games');
+
+      triggerAutoSave();
+    }
+
+    function addTmiItem() {
+      const list = document.getElementById('tmi-list');
+      if (!list) return;
+      const div = document.createElement('div');
+      div.className = 'item-row tmi-item';
+      div.style.cssText = 'flex-direction:column; align-items:flex-start; gap:8px;';
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+          <span contenteditable="true" class="day-badge tmi-tag" style="background:#ffecb3; color:#d97706;">💡 TMI</span>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
+            <button class="del-btn admin-only" onclick="this.closest('.tmi-item').remove(); updateAllPaginations(); triggerAutoSave();">×</button>
+          </div>
+        </div>
+        <div contenteditable="true" class="tmi-content-text" style="font-size:0.9rem; width:100%;">TMI 내용 입력</div>`;
+      list.appendChild(div);
+      setEditable(true);
+      updateAllPaginations();
+
+      const itemsPerPage = pageLimit['tmi'] || 30;
+      const items = Array.from(list.children).filter(c => c.nodeType === 1 && !c.classList.contains('pagination-bar'));
+      pageState['tmi'] = Math.ceil(items.length / itemsPerPage) || 1;
+      renderPaginatedList('tmi-list', 'pagination-tmi', 'tmi');
+
+      triggerAutoSave();
+    }
+
+    function addLink() {
+      const list = document.getElementById('link-list');
+      if (!list) return;
+      const div = document.createElement('div');
+      div.className = 'item-row link-item';
+      div.innerHTML = `
+        <div class="link-anchor" data-href="https://" onclick="handleLinkAnchorClick(this)">
+          <span class="link-name">새로운 링크</span><span>→</span>
+        </div>
+        <div class="link-edit-box admin-only flex">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+            <span contenteditable="true" class="link-name-edit" style="font-weight:700; flex:1;" oninput="applyLinkData(); triggerAutoSave();">새로운 링크</span>
+            <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+            <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
+            <button class="del-btn admin-only" onclick="this.closest('.link-item').remove(); triggerAutoSave();">삭제 ×</button>
+          </div>
+          <input type="text" class="url-input" value="https://" placeholder="https://" oninput="applyLinkData(); this.setAttribute('value', this.value); triggerAutoSave();">
+        </div>`;
+      list.appendChild(div);
+      applyLinkData();
+      setEditable(true);
+      triggerAutoSave();
+    }
+
+    function addAnniversary() {
+      const list = document.getElementById('anniv-list');
+      if (!list) return;
+      const today = new Date();
+      const todayYmd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const div = document.createElement('div');
+      div.className = 'item-row anniv-item';
+      div.setAttribute('data-date', todayYmd);
+      div.innerHTML = `
+        <span class="anniv-date">${formatAnnivDate(todayYmd)}</span>
+        <span class="info-text anniv-title" contenteditable="true">기념일 내용</span>
+        <span class="dday-badge">D-Day</span>
+        <div class="admin-only flex" style="gap:4px; align-items:center;">
+          <input type="date" class="date-input anniv-date-picker" value="${todayYmd}" onchange="updateAnnivDate(this);">
+          <button class="move-btn admin-only" onclick="moveRowUp(this)">⬆️</button>
+          <button class="move-btn admin-only" onclick="moveRowDown(this)">⬇</button>
+          <button class="del-btn admin-only" onclick="this.closest('.anniv-item').remove(); triggerAutoSave();">×</button>
+        </div>`;
+      list.appendChild(div);
+      setEditable(true);
+      refreshAllDDay();
+      triggerAutoSave();
+    }
+
+    function openThemeModal() { 
+      const theme = storeData.theme || { bg: '#fff8fb', accent: '#ff4d73', text: '#5c3a42', tabText: '#ff758c' };
+      tempOriginalTheme = { ...theme };
+
+      const pBg = document.getElementById('picker-bg');
+      const pAccent = document.getElementById('picker-accent');
+      const pText = document.getElementById('picker-text');
+      const pTabText = document.getElementById('picker-tab-text');
+
+      if (pBg) pBg.value = theme.bg || '#fff8fb';
+      if (pAccent) pAccent.value = theme.accent || '#ff4d73';
+      if (pText) pText.value = theme.text || '#5c3a42';
+      if (pTabText) pTabText.value = theme.tabText || '#ff758c';
+
+      openModal('theme-modal'); 
+    }
+
+    function cancelThemeModal() { 
+      if (tempOriginalTheme) {
+        document.documentElement.style.setProperty('--bg-color', tempOriginalTheme.bg);
+        document.documentElement.style.setProperty('--accent-color', tempOriginalTheme.accent);
+        document.documentElement.style.setProperty('--text-color', tempOriginalTheme.text);
+        document.documentElement.style.setProperty('--tab-text-color', tempOriginalTheme.tabText);
+        storeData.theme = { ...tempOriginalTheme };
+        triggerAutoSave();
+      }
+      closeModal('theme-modal'); 
+    }
+
+    function applyCustomTheme() {
+      const bg = document.getElementById('picker-bg').value;
+      const accent = document.getElementById('picker-accent').value;
+      const text = document.getElementById('picker-text').value;
+      const tabText = document.getElementById('picker-tab-text').value;
+
+      document.documentElement.style.setProperty('--bg-color', bg);
+      document.documentElement.style.setProperty('--accent-color', accent);
+      document.documentElement.style.setProperty('--text-color', text);
+      document.documentElement.style.setProperty('--tab-text-color', tabText);
+
+      storeData.theme = { bg, accent, text, tabText };
+      triggerAutoSave();
+    }
+
+    function saveThemeSettings() { 
+      applyCustomTheme();
+      closeModal('theme-modal'); 
+      savePage(false); 
+    }
+
+    function openBulkPasteModal(target) {
+      currentBulkPasteTarget = target;
+      document.getElementById('bulk-paste-text').value = '';
+      openModal('bulk-paste-modal');
+    }
+
+    function applyBulkPaste() {
+      extractStoreDataFromDOM();
+      const rawText = document.getElementById('bulk-paste-text').value;
+      if (!rawText.trim()) { closeModal('bulk-paste-modal'); return; }
+      const lines = rawText.split('\n');
+      const today = new Date();
+      const todayFormatted = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+      const todayYmd8 = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+
+      if (currentBulkPasteTarget === 'achievements') {
+        lines.forEach(line => { if (line.trim()) storeData.achievements.push([todayYmd8, line.trim()]); });
+      } else if (currentBulkPasteTarget === 'games') {
+        lines.forEach(line => { if (line.trim()) storeData.games.push([line.trim(), "⭐⭐⭐⭐⭐⭐", todayFormatted, "후기 기재"]); });
+      } else if (currentBulkPasteTarget === 'tmi') {
+        lines.forEach(line => { if (line.trim()) storeData.tmi.push(["💡 TMI", line.trim()]); });
+      }
+      closeModal('bulk-paste-modal'); 
+      renderFromJSON(storeData); 
+      triggerAutoSave();
+    }
+
     function loadFromLocalStorage() {
       try {
         const localStore = localStorage.getItem('local_store_data');
@@ -2502,10 +3612,7 @@
         }
       } catch(e) {}
 
-      loadMusicFromLocal();
       renderFromJSON(storeData);
-      renderPlaylistEditor();
-      updateMusicPlayerUI();
 
       if (!storeData.profile || !storeData.profile.img) {
         ImageStore.getImage('profile_img').then(idbImg => {
@@ -2544,7 +3651,6 @@
                 storeData.gameBio = DEFAULT_GAME_BIO;
               }
               renderFromJSON(storeData);
-              renderPlaylistEditor();
             }
             if (data.cal_events) {
               try { calendarEvents = JSON.parse(data.cal_events); } catch(e){}
